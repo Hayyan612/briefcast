@@ -48,7 +48,7 @@
 > The diagrams render on GitHub: drag to pan, scroll or use the controls to zoom.
 
 ```mermaid
-flowchart LR
+flowchart TB
     user(["👤 Listener<br/>browser · email · podcast app"])
 
     subgraph public["Public: briefcast.hayyan.space"]
