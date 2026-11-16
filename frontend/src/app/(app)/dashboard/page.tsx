@@ -33,7 +33,11 @@ import {
   type Voice,
 } from "@/lib/types";
 
-type Search = Promise<{ q?: string | string[]; briefing?: string | string[] }>;
+type Search = Promise<{
+  q?: string | string[];
+  briefing?: string | string[];
+  onboarding?: string | string[];
+}>;
 
 function one(v: string | string[] | undefined): string {
   return (Array.isArray(v) ? v[0] : v)?.trim() ?? "";
@@ -61,7 +65,10 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
   const latest = episodes.find((e) => e.status === "ready");
   const generating = allEpisodes.some((e) => IN_PROGRESS.includes(e.status));
   const shownBriefings = selected ? [selected] : briefings;
-  if (!briefings.length) {
+  // Development-only: `?onboarding=1` previews the first-run flow with an existing account.
+  const previewOnboarding =
+    process.env.NODE_ENV !== "production" && one(params.onboarding) === "1";
+  if (!briefings.length || previewOnboarding) {
     return <Onboarding voices={voices} name={session.user.name} />;
   }
 

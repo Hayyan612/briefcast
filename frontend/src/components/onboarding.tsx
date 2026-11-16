@@ -7,8 +7,10 @@ import { notify as toast } from "@/lib/notify";
 
 import {
   ArrowLeftIcon,
+  ChevronRightIcon,
   AudioLinesIcon,
   ClockIcon,
+  GlobalIcon,
   MailIcon,
   SearchIcon,
 } from "@/components/icons";
@@ -21,7 +23,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { InterestPicker } from "@/components/interest-picker";
+import { OnboardingSources } from "@/components/onboarding-sources";
 import { Input } from "@/components/ui/input";
 import {
   Item,
@@ -40,8 +55,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { VoiceFields } from "@/components/voice-fields";
 import {
   timezoneOptions,
@@ -49,17 +64,15 @@ import {
 } from "@/hooks/use-browser-timezone";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
+import { composeTopic, coverForPicks, MAX_PICKS } from "@/lib/interests";
 import { languageLabel } from "@/lib/languages";
+import {
+  LOOKBACKS,
+  REGIONS,
+  regionForTimezone,
+  type Lookback,
+} from "@/lib/sources";
 import type { Briefing, EpisodeSummary, Voice } from "@/lib/types";
-
-const SUGGESTIONS = [
-  "Startup funding announced in the last 24 hours",
-  "New AI models, papers and product launches",
-  "Indian stock market moves and why they happened",
-  "Climate tech and clean energy news",
-  "Cricket results and talking points",
-  "Big tech policy and regulation",
-];
 
 const HOW = [
   {
@@ -79,7 +92,13 @@ const HOW = [
   },
 ];
 
-const STEPS = ["Welcome", "Topic", "Schedule", "Review"] as const;
+const STEPS = [
+  "Welcome",
+  "Interests",
+  "Sources",
+  "Schedule",
+  "Review",
+] as const;
 
 export function Onboarding({
   voices,
@@ -91,7 +110,10 @@ export function Onboarding({
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [topic, setTopic] = useState("");
+  const [picks, setPicks] = useState<string[]>([]);
+  // A hand-edited brief wins over the one composed from the picks.
+  const [topicEdit, setTopicEdit] = useState<string | null>(null);
+  const topic = topicEdit ?? composeTopic(picks);
   const [time, setTime] = useState("08:00");
   const detectedTz = useBrowserTimezone();
   const [chosenTz, setTimezone] = useState<string | null>(null);
@@ -99,6 +121,10 @@ export function Onboarding({
   const [voice, setVoice] = useState(voices[0]?.id ?? "");
   const [language, setLanguage] = useState("en-IN");
   const [busy, setBusy] = useState(false);
+  const [chosenRegion, setRegion] = useState<string | null>(null);
+  const region = chosenRegion ?? regionForTimezone(timezone);
+  const [lookback, setLookback] = useState<Lookback>("day");
+  const [emailEnabled, setEmailEnabled] = useState(true);
 
   const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
   const voiceItems = useMemo(
@@ -119,10 +145,14 @@ export function Onboarding({
         method: "POST",
         body: JSON.stringify({
           topic,
+          ...coverForPicks(picks),
           delivery_time: time,
           timezone,
           voice,
           language,
+          region: region || null,
+          lookback,
+          email_enabled: emailEnabled,
         }),
       });
       const episode = await api<EpisodeSummary>(
@@ -205,47 +235,46 @@ export function Onboarding({
               <>
                 <CardHeader>
                   <CardTitle className="text-mac-title-1 font-bold">
-                    What should we follow?
+                    What are you into?
                   </CardTitle>
                   <CardDescription className="text-mac-title-3">
-                    Choose a starting point or write your own. Specific topics
-                    make better episodes.
+                    Pick up to {MAX_PICKS} interests and we blend them into one
+                    daily episode, like a mix made for you.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <FieldGroup>
-                    <ToggleGroup
-                      aria-label="Suggested topics"
-                      value={SUGGESTIONS.includes(topic) ? [topic] : []}
-                      onValueChange={(v) => setTopic((v as string[])[0] ?? "")}
-                      variant="outline"
-                      orientation="vertical"
-                      className="w-full"
-                    >
-                      {SUGGESTIONS.map((s) => (
-                        <ToggleGroupItem
-                          key={s}
-                          value={s}
-                          className="h-auto justify-start py-2.5 text-left whitespace-normal aria-pressed:border-mac-accent aria-pressed:bg-mac-accent/10 aria-pressed:font-semibold aria-pressed:text-mac-accent"
-                        >
-                          {s}
-                        </ToggleGroupItem>
-                      ))}
-                    </ToggleGroup>
-                    <Field>
-                      <FieldLabel htmlFor="ob-topic">
-                        Or describe your own
-                      </FieldLabel>
-                      <Textarea
-                        id="ob-topic"
-                        rows={2}
-                        maxLength={500}
-                        value={topic}
-                        onChange={(e) => setTopic(e.target.value)}
-                        placeholder="e.g. Funding rounds for Indian fintech startups"
-                      />
-                    </Field>
-                  </FieldGroup>
+                <CardContent className="grid gap-5">
+                  <InterestPicker
+                    picks={picks}
+                    onChange={(next) => {
+                      setPicks(next);
+                      setTopicEdit(null);
+                    }}
+                  />
+                  {picks.length ? (
+                    <Collapsible className="rounded-mac-group border border-mac-separator">
+                      <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2.5 text-left">
+                        <ChevronRightIcon className="size-4 text-mac-label-secondary transition-transform duration-200 group-data-[panel-open]:rotate-90" />
+                        <span className="font-medium">Fine-tune the brief</span>
+                        <span className="ml-auto truncate text-mac-callout text-mac-label-secondary max-sm:hidden">
+                          What the research agent is asked to cover
+                        </span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="px-3 pb-3">
+                        <Field>
+                          <FieldLabel htmlFor="ob-topic" className="sr-only">
+                            Brief
+                          </FieldLabel>
+                          <Textarea
+                            id="ob-topic"
+                            rows={3}
+                            maxLength={500}
+                            value={topic}
+                            onChange={(e) => setTopicEdit(e.target.value)}
+                          />
+                        </Field>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : null}
                 </CardContent>
                 <CardFooter className="justify-between">
                   <Button variant="ghost" onClick={() => go(0)}>
@@ -260,6 +289,36 @@ export function Onboarding({
             ) : null}
 
             {step === 2 ? (
+              <>
+                <CardHeader>
+                  <CardTitle className="text-mac-title-1 font-bold">
+                    Where should the news come from?
+                  </CardTitle>
+                  <CardDescription className="text-mac-title-3">
+                    We set this from your time zone. You can change it any time.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <OnboardingSources
+                    region={region}
+                    lookback={lookback}
+                    onRegion={setRegion}
+                    onLookback={setLookback}
+                  />
+                </CardContent>
+                <CardFooter className="justify-between">
+                  <Button variant="ghost" onClick={() => go(1)}>
+                    <ArrowLeftIcon data-icon="inline-start" />
+                    Back
+                  </Button>
+                  <Button size="lg" onClick={() => go(3)}>
+                    Continue
+                  </Button>
+                </CardFooter>
+              </>
+            ) : null}
+
+            {step === 3 ? (
               <>
                 <CardHeader>
                   <CardTitle className="text-mac-title-1 font-bold">
@@ -315,18 +374,18 @@ export function Onboarding({
                   </FieldGroup>
                 </CardContent>
                 <CardFooter className="justify-between">
-                  <Button variant="ghost" onClick={() => go(1)}>
+                  <Button variant="ghost" onClick={() => go(2)}>
                     <ArrowLeftIcon data-icon="inline-start" />
                     Back
                   </Button>
-                  <Button size="lg" onClick={() => go(3)}>
+                  <Button size="lg" onClick={() => go(4)}>
                     Continue
                   </Button>
                 </CardFooter>
               </>
             ) : null}
 
-            {step === 3 ? (
+            {step === 4 ? (
               <>
                 <CardHeader>
                   <CardTitle className="text-mac-title-1 font-bold">
@@ -372,10 +431,37 @@ export function Onboarding({
                         </ItemTitle>
                       </ItemContent>
                     </Item>
+                    <Item variant="outline">
+                      <ItemMedia variant="icon" className="text-mac-accent">
+                        <GlobalIcon />
+                      </ItemMedia>
+                      <ItemContent>
+                        <ItemDescription>Sources</ItemDescription>
+                        <ItemTitle>
+                          {REGIONS.find((r) => r.value === region)?.label} ·{" "}
+                          {LOOKBACKS.find((l) => l.value === lookback)?.label}
+                        </ItemTitle>
+                      </ItemContent>
+                    </Item>
                   </ItemGroup>
+                  <Field orientation="horizontal" className="mt-4">
+                    <FieldContent>
+                      <FieldLabel htmlFor="ob-email">
+                        Email me when each episode is ready
+                      </FieldLabel>
+                      <FieldDescription>
+                        A link to listen, sent to your Google address.
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      id="ob-email"
+                      checked={emailEnabled}
+                      onCheckedChange={(v) => setEmailEnabled(v)}
+                    />
+                  </Field>
                 </CardContent>
                 <CardFooter className="justify-between">
-                  <Button variant="ghost" onClick={() => go(2)} disabled={busy}>
+                  <Button variant="ghost" onClick={() => go(3)} disabled={busy}>
                     <ArrowLeftIcon data-icon="inline-start" />
                     Back
                   </Button>

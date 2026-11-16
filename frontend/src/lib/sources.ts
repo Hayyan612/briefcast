@@ -19,3 +19,33 @@ export function splitList(text: string): string[] {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+const TIMEZONE_REGIONS: [RegExp, string][] = [
+  [/^Asia\/(Kolkata|Calcutta)$/, "india"],
+  [/^Asia\/Dubai$/, "united arab emirates"],
+  [/^Asia\/Singapore$/, "singapore"],
+  [/^Asia\/Tokyo$/, "japan"],
+  [/^Europe\/London$/, "united kingdom"],
+  [/^Europe\/Berlin$/, "germany"],
+  [/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax)$/, "canada"],
+  [
+    /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage)$/,
+    "united states",
+  ],
+  [/^Australia\//, "australia"],
+];
+
+/** A sensible default region for someone in `timezone` ("" = anywhere). */
+export function regionForTimezone(timezone: string): string {
+  return TIMEZONE_REGIONS.find(([re]) => re.test(timezone))?.[1] ?? "";
+}
+
+export const LOOKBACKS = [
+  { value: "day", label: "Daily update", hint: "News from the last 24 hours" },
+  {
+    value: "week",
+    label: "Weekly roundup",
+    hint: "The best of the last 7 days",
+  },
+] as const;
+export type Lookback = (typeof LOOKBACKS)[number]["value"];
