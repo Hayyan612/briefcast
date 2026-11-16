@@ -19,10 +19,11 @@ from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from arq import Retry, cron, func
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
 from tavily import AsyncTavilyClient
 
+from app.agent.context import ResearchContext, gather_context
 from app.agent.llm import make_client
 from app.agent.research import ResearchAgent
 from app.agent.script import write_script
@@ -31,11 +32,13 @@ from app.db import SessionLocal
 from app.mailer import episode_email, send_mail
 from app.models import (
     Briefing,
+    BriefingLink,
     Episode,
     EpisodeAudio,
     EpisodeStatus,
     EpisodeTrigger,
     User,
+    WatchedPage,
 )
 from app.queue import GENERATE_EPISODE, enqueue_episode, redis_settings
 from app.scheduling import next_run_after
@@ -151,14 +154,18 @@ async def generate_episode(ctx: dict, episode_id_str: str) -> str:
     try:
         if not script:
             await set_status(episode_id, EpisodeStatus.researching)
-            agent = ResearchAgent(ctx["llm"], ctx["tavily"])
+            async with SessionLocal() as session:
+                context = await gather_context(session, ctx["tavily"], briefing, episode_id)
+            agent = ResearchAgent(ctx["llm"], ctx["tavily"], context.prefs)
             research = await agent.run(ep.topic, now_utc(), local_date)
             await set_status(
                 episode_id,
                 EpisodeStatus.writing,
                 sources=[s.public() for s in research.sources],
                 research_log=research.log,
+                findings=[f["point"] for f in research.findings],
             )
+            await remember_context(context, episode_id)
             # Indic speech runs slower per word than English, so aim for fewer words.
             target = settings.target_words
             if briefing.language != "en-IN":
@@ -187,6 +194,23 @@ async def generate_episode(ctx: dict, episode_id_str: str) -> str:
 
     await send_ready_email(episode_id)
     return "ready"
+
+
+async def remember_context(context: ResearchContext, episode_id: uuid.UUID) -> None:
+    """After research: requested links are used, and new pages on followed sites are seen."""
+    async with SessionLocal() as session, session.begin():
+        if context.link_ids:
+            await session.execute(
+                update(BriefingLink)
+                .where(BriefingLink.id.in_(context.link_ids))
+                .values(used_at=now_utc(), used_episode_id=episode_id)
+            )
+        for page in context.new_pages:
+            await session.execute(
+                insert(WatchedPage)
+                .values(briefing_id=page.briefing_id, site=page.site, url=page.url)
+                .on_conflict_do_nothing(constraint="uq_watched_page")
+            )
 
 
 async def _retry_or_fail(ctx: dict, episode_id: uuid.UUID, exc: Exception) -> None:

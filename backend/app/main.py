@@ -2,7 +2,7 @@
 
 import uuid
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Request, Response, status
@@ -12,11 +12,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.audio import audio_response, slug_filename
 from app.auth import CurrentUser
-from app.config import get_settings
 from app.db import DbSession
-from app.models import Briefing, Episode, EpisodeAudio, EpisodeStatus, EpisodeTrigger, User
+from app.episodes import start_manual_episode
+from app.models import (
+    Briefing,
+    BriefingLink,
+    Episode,
+    EpisodeAudio,
+    EpisodeStatus,
+    User,
+)
 from app.queue import enqueue_episode, make_pool
 from app.routes import feed as feed_routes
+from app.routes import links as links_routes
 from app.routes import public as public_routes
 from app.routes import voices as voices_routes
 from app.scheduling import next_run_after
@@ -42,6 +50,7 @@ app = FastAPI(title="Briefcast API", lifespan=lifespan)
 app.include_router(voices_routes.router)
 app.include_router(feed_routes.router)
 app.include_router(public_routes.router)
+app.include_router(links_routes.router)
 
 
 def now_utc() -> datetime:
@@ -91,6 +100,17 @@ async def latest_episodes(session: AsyncSession, briefing_ids: list[uuid.UUID]) 
     return {e.briefing_id: e for e in rows}
 
 
+async def pending_link_counts(session: AsyncSession, briefing_ids: list[uuid.UUID]) -> dict:
+    if not briefing_ids:
+        return {}
+    rows = await session.execute(
+        select(BriefingLink.briefing_id, func.count())
+        .where(BriefingLink.briefing_id.in_(briefing_ids), BriefingLink.used_at.is_(None))
+        .group_by(BriefingLink.briefing_id)
+    )
+    return dict(rows.all())
+
+
 def briefing_out(briefing: Briefing, latest: Episode | None) -> BriefingOut:
     out = BriefingOut.model_validate(briefing)
     out.latest_episode = EpisodeSummary.model_validate(latest) if latest else None
@@ -104,8 +124,15 @@ async def list_briefings(user: CurrentUser, session: DbSession) -> list[Briefing
             select(Briefing).where(Briefing.user_id == user.id).order_by(Briefing.created_at.desc())
         )
     )
-    latest = await latest_episodes(session, [b.id for b in briefings])
-    return [briefing_out(b, latest.get(b.id)) for b in briefings]
+    ids = [b.id for b in briefings]
+    latest = await latest_episodes(session, ids)
+    pending = await pending_link_counts(session, ids)
+    out = []
+    for b in briefings:
+        item = briefing_out(b, latest.get(b.id))
+        item.pending_links = pending.get(b.id, 0)
+        out.append(item)
+    return out
 
 
 @app.post("/briefings", response_model=BriefingOut, status_code=201)
@@ -125,6 +152,12 @@ async def create_briefing(
         voice=body.voice,
         language=body.language,
         email_enabled=body.email_enabled,
+        trusted_domains=body.trusted_domains,
+        blocked_domains=body.blocked_domains,
+        region=body.region,
+        lookback=body.lookback,
+        finance_mode=body.finance_mode,
+        watch_urls=body.watch_urls,
         next_run_at=next_run_after(body.delivery_time, body.timezone, now_utc()),
     )
     session.add(briefing)
@@ -147,7 +180,7 @@ async def update_briefing(
     if changes.get("delivery_time"):
         changes["delivery_time"] = changes["delivery_time"].replace(second=0, microsecond=0)
     for field, value in changes.items():
-        if value is not None:
+        if value is not None or field == "region":
             setattr(briefing, field, value)
     if not voice_supports(briefing.voice, briefing.language):
         raise HTTPException(
@@ -182,36 +215,7 @@ async def run_now(
 ) -> Episode:
     """Generate an episode immediately (for demos), outside the daily schedule."""
     briefing = await owned_briefing(session, user, briefing_id)
-    in_flight = await session.scalar(
-        select(func.count()).where(
-            Episode.briefing_id == briefing.id,
-            Episode.status.notin_([EpisodeStatus.ready, EpisodeStatus.failed]),
-        )
-    )
-    if in_flight:
-        raise HTTPException(status.HTTP_409_CONFLICT, "An episode is already being generated")
-    manual_today = await session.scalar(
-        select(func.count()).where(
-            Episode.user_id == user.id,
-            Episode.trigger == EpisodeTrigger.manual,
-            Episode.created_at > now_utc() - timedelta(days=1),
-        )
-    )
-    if (manual_today or 0) >= get_settings().manual_runs_per_day:
-        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Daily limit for manual runs")
-
-    episode = Episode(
-        briefing_id=briefing.id,
-        user_id=user.id,
-        topic=briefing.topic,
-        trigger=EpisodeTrigger.manual,
-        scheduled_for=now_utc(),
-    )
-    session.add(episode)
-    await session.commit()
-    await session.refresh(episode)
-    await enqueue_episode(request.app.state.redis, episode.id)
-    return episode
+    return await start_manual_episode(session, request.app.state.redis, user, briefing)
 
 
 # ---------- episodes ----------

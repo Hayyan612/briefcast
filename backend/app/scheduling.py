@@ -29,3 +29,7 @@ def next_run_after(delivery_time: time, tz_name: str, after: datetime) -> dateti
             return utc
         candidate_date += timedelta(days=1)
     raise RuntimeError("unreachable: no run time found within 3 days")
+
+
+def now_utc() -> datetime:
+    return datetime.now(UTC)

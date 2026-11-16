@@ -58,6 +58,14 @@ class Briefing(Base):
     language: Mapped[str] = mapped_column(String(8), default="en-IN", server_default="en-IN")
     email_enabled: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Source controls (all optional).
+    trusted_domains: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    blocked_domains: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    region: Mapped[str | None] = mapped_column(String(32))
+    lookback: Mapped[str] = mapped_column(String(8), default="day", server_default="day")
+    finance_mode: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # Websites to follow: new pages on them become sources.
+    watch_urls: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
     # Next due instant in UTC. The scheduler only ever compares this to now().
     next_run_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -106,6 +114,8 @@ class Episode(Base):
     script: Mapped[str | None] = mapped_column(Text)
     sources: Mapped[list | None] = mapped_column(JSONB)
     research_log: Mapped[list | None] = mapped_column(JSONB)
+    # Short statements of what this episode covered; later episodes avoid repeating them.
+    findings: Mapped[list | None] = mapped_column(JSONB)
     duration_seconds: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[str | None] = mapped_column(Text)
     attempts: Mapped[int] = mapped_column(Integer, default=0)
@@ -135,3 +145,38 @@ class VoicePreview(Base):
     key: Mapped[str] = mapped_column(String(96), primary_key=True)
     data: Mapped[bytes] = mapped_column(LargeBinary)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class BriefingLink(Base):
+    """An article the listener asked to include ("Add a link")."""
+
+    __tablename__ = "briefing_links"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    briefing_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("briefings.id", ondelete="CASCADE"), index=True
+    )
+    url: Mapped[str] = mapped_column(Text)
+    title: Mapped[str | None] = mapped_column(Text)
+    used_episode_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("episodes.id", ondelete="SET NULL")
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class WatchedPage(Base):
+    """A page already seen on a followed website, so only new pages count as news."""
+
+    __tablename__ = "watched_pages"
+    __table_args__ = (UniqueConstraint("briefing_id", "url", name="uq_watched_page"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    briefing_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("briefings.id", ondelete="CASCADE"), index=True
+    )
+    site: Mapped[str] = mapped_column(Text)
+    url: Mapped[str] = mapped_column(Text)
+    first_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
