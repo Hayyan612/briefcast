@@ -51,7 +51,7 @@ def episode_email(
     hello = f"Hi {name.split()[0]}," if name else "Hi,"
     text = (
         f'{hello}\n\nToday\'s episode on "{topic}" is ready ({minutes} min, {sources} sources).\n\n'
-        f"Listen: {url}\n\n— Briefcast\n\nStop emails for this briefing: {unsubscribe_url}"
+        f"Listen: {url}\n\nBriefcast\n\nStop emails for this briefing: {unsubscribe_url}"
     )
     logo = f"{get_settings().app_url.rstrip('/')}/brand/email-icon.png"
     font = "-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif"
@@ -69,7 +69,7 @@ def episode_email(
 <p style="margin:12px 0 0;font:15px/1.55 {font};color:#424245">{escape(hello)} today's episode on
 <strong style="color:#1d1d1f;font-weight:600">{escape(topic)}</strong> is ready.</p>
 <p style="margin:24px 0 0"><a href="{escape(url)}" style="background:#0071e3;color:#ffffff;text-decoration:none;
-font:600 15px/1 {font};padding:13px 22px;border-radius:999px;display:inline-block">&#9654;&nbsp; Listen now</a></p>
+font:600 15px/1 {font};padding:13px 22px;border-radius:999px;display:inline-block">Listen now</a></p>
 </td></tr>
 <tr><td style="padding:16px 4px 0;font:12px/1.5 {font};color:#6e6e73">You get this because you scheduled this briefing.
 <a href="{escape(unsubscribe_url)}" style="color:#6e6e73">Stop emails for this briefing</a></td></tr>
