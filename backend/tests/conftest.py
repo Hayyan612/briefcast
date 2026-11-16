@@ -1,4 +1,11 @@
 import os
+
+# Tests run against their own database, never the dev one the worker reads from.
+os.environ["DATABASE_URL"] = os.environ.get(
+    "TEST_DATABASE_URL", "postgresql+asyncpg://briefcast:briefcast@localhost:5442/briefcast_test"
+)
+os.environ["REDIS_URL"] = os.environ.get("TEST_REDIS_URL", "redis://localhost:6392/15")
+
 import time
 import uuid
 
