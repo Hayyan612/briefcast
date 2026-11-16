@@ -11,9 +11,10 @@ import {
   PencilIcon,
   PlayIcon,
   Trash2Icon,
-} from "lucide-react";
+} from "@/components/icons";
 
 import { BriefingDialog } from "@/components/briefing-dialog";
+import { LocalTime } from "@/components/local-time";
 import { StatusBadge } from "@/components/status-badge";
 import {
   AlertDialog,
@@ -52,7 +53,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { api } from "@/lib/api";
-import { formatDateTime, formatTime } from "@/lib/format";
+import { formatTime } from "@/lib/format";
 import { IN_PROGRESS, type Briefing, type Voice } from "@/lib/types";
 
 export function BriefingCard({
@@ -90,7 +91,7 @@ export function BriefingCard({
   }
 
   return (
-    <Card>
+    <Card className="min-w-0 overflow-hidden">
       <CardHeader>
         <CardTitle className="font-heading text-lg leading-snug">
           {briefing.topic}
@@ -140,19 +141,27 @@ export function BriefingCard({
           </DropdownMenu>
         </CardAction>
       </CardHeader>
-      <CardContent className="text-sm text-muted-foreground">
-        {briefing.is_active
-          ? `Next episode ${formatDateTime(briefing.next_run_at)}`
-          : "Paused. No episodes will be generated."}
+      <CardContent className="min-w-0 text-sm text-muted-foreground">
+        {briefing.is_active ? (
+          <>
+            Next episode <LocalTime iso={briefing.next_run_at} />
+          </>
+        ) : (
+          "Paused. No episodes will be generated."
+        )}
         {latest ? (
           <div className="mt-3 flex items-center gap-2">
-            <span>Latest:</span>
+            <span>Latest episode</span>
             <StatusBadge status={latest.status} />
             <Link
               href={`/episodes/${latest.id}`}
-              className={buttonVariants({ variant: "link", size: "sm" })}
+              className={buttonVariants({
+                variant: "link",
+                size: "sm",
+                className: "ml-auto px-0",
+              })}
             >
-              {latest.title ?? "Open episode"}
+              Open
             </Link>
           </div>
         ) : null}

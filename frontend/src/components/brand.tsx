@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RadioIcon } from "lucide-react";
+import { RadioIcon } from "@/components/icons";
 
 import { Badge } from "@/components/ui/badge";
 

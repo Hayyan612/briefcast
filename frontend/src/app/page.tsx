@@ -1,7 +1,12 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
-import { AudioLinesIcon, ClockIcon, MailIcon, SearchIcon } from "lucide-react";
+import {
+  AudioLinesIcon,
+  ClockIcon,
+  MailIcon,
+  SearchIcon,
+} from "@/components/icons";
 
 import { auth, signIn } from "@/auth";
 import { Brand } from "@/components/brand";

@@ -114,3 +114,24 @@ Google OAuth redirect URI: `<APP_URL>/api/auth/callback/google`.
 
 `docker compose up -d --build` with a filled `.env` (see `.env.example`). Only `web`
 (port 3000) needs a domain.
+
+## Frontend
+
+Next.js 16 (App Router, Cache Components) with **shadcn/ui on Base UI**, Quicksand, a light
+violet theme checked against WCAG AA (text ≥ 4.5:1, form borders ≥ 3:1), and Motion for
+transitions (all of them respect `prefers-reduced-motion`).
+
+- **App shell:** shadcn `Sidebar` with your briefings, search (`⌘K`), and a persistent
+  bottom player (one `<audio>` element in a React context, so playback continues across
+  pages; ±15 s, speed, volume, seek, Space to play or pause).
+- **Onboarding:** four short steps (welcome, topic, schedule and voice, review) that create
+  the first briefing and immediately generate its first episode.
+- **Episode page:** script, sources and the agent's research log; live progress while the
+  worker runs.
+- **Timezones:** schedules are stored as wall-clock time plus IANA zone; timestamps render in
+  the viewer's own zone without hydration mismatches.
+
+## Credits
+
+- Layout inspired by [Free Podcast Player Web Design](https://www.figma.com/community/file/1247099379637461701/free-podcast-player-web-design) by wellrafi (CC BY 4.0).
+- Icons: [Solar](https://www.figma.com/community/file/1166831539721848736) by 480 Design (CC BY 4.0), via `@solar-icons/react`.

@@ -31,6 +31,10 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  timezoneOptions,
+  useBrowserTimezone,
+} from "@/hooks/use-browser-timezone";
 import { api } from "@/lib/api";
 import type { Briefing, Voice } from "@/lib/types";
 
@@ -39,14 +43,6 @@ const EXAMPLES = [
   "New AI model releases and research papers",
   "Indian stock market moves and the reasons behind them",
 ];
-
-function browserTimezone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
-  } catch {
-    return "Asia/Kolkata";
-  }
-}
 
 interface Props {
   voices: Voice[];
@@ -72,15 +68,14 @@ export function BriefingDialog({
   const [time, setTime] = useState(
     briefing?.delivery_time.slice(0, 5) ?? "08:00",
   );
-  const [timezone, setTimezone] = useState(
-    briefing?.timezone ?? browserTimezone(),
+  const detectedTz = useBrowserTimezone();
+  const [chosenTz, setTimezone] = useState<string | null>(
+    briefing?.timezone ?? null,
   );
+  const timezone = chosenTz ?? detectedTz ?? "Asia/Kolkata";
   const [voice, setVoice] = useState(briefing?.voice ?? voices[0]?.id ?? "");
 
-  const timezones = useMemo(() => {
-    const all = Intl.supportedValuesOf?.("timeZone") ?? [];
-    return all.includes(timezone) ? all : [timezone, ...all];
-  }, [timezone]);
+  const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
   const voiceItems = useMemo(
     () => Object.fromEntries(voices.map((v) => [v.id, v.label])),
     [voices],

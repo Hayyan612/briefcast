@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RotateCcwIcon } from "lucide-react";
+import { RotateCcwIcon } from "@/components/icons";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";

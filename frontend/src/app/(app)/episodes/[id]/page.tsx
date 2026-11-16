@@ -10,12 +10,13 @@ import {
   FileTextIcon,
   SearchIcon,
   SparklesIcon,
-} from "lucide-react";
+} from "@/components/icons";
 
 import { auth } from "@/auth";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { RetryButton } from "@/components/retry-button";
-import { SiteHeader } from "@/components/site-header";
+import { CoverArt } from "@/components/cover-art";
+import { EpisodeHero } from "@/components/episode-hero";
 import { StatusBadge } from "@/components/status-badge";
 import {
   Alert,
@@ -23,6 +24,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert";
+import { LocalTime } from "@/components/local-time";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -45,12 +47,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { backendFetch } from "@/lib/backend";
-import {
-  formatDateTime,
-  formatDuration,
-  STATUS_LABEL,
-  STATUS_PROGRESS,
-} from "@/lib/format";
+import { STATUS_LABEL, STATUS_PROGRESS } from "@/lib/format";
 import {
   IN_PROGRESS,
   type EpisodeDetail,
@@ -96,55 +93,55 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
     <>
       <AutoRefresh active={inProgress} />
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge status={ep.status} />
-            <Badge variant="outline">{formatDateTime(ep.scheduled_for)}</Badge>
-            {ep.duration_seconds ? (
-              <Badge variant="outline">
-                {formatDuration(ep.duration_seconds)}
-              </Badge>
-            ) : null}
-            {ep.sources?.length ? (
-              <Badge variant="outline">{ep.sources.length} sources</Badge>
-            ) : null}
-          </div>
-          <CardTitle className="font-heading text-3xl leading-tight font-semibold">
-            {ep.title ?? ep.topic}
-          </CardTitle>
-          <CardDescription>{ep.topic}</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {ep.status === "ready" ? (
-            <audio
-              controls
-              preload="metadata"
-              src={`/api/backend/episodes/${ep.id}/audio`}
-              className="w-full"
-            />
-          ) : null}
-          {inProgress ? (
-            <div className="grid gap-2">
-              <Progress value={STATUS_PROGRESS[ep.status]} />
-              <p className="text-sm text-muted-foreground">
-                {STATUS_LABEL[ep.status]}… This page updates by itself. You’ll
-                also get an email when it’s ready.
-              </p>
+      {ep.status === "ready" ? (
+        <EpisodeHero
+          episode={ep}
+          eyebrow="Episode"
+          sources={ep.sources?.length ?? 0}
+          showOpen={false}
+        />
+      ) : (
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-4">
+            <CoverArt topic={ep.topic} className="size-16" />
+            <div className="grid gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusBadge status={ep.status} />
+                <Badge variant="outline">
+                  <LocalTime iso={ep.scheduled_for} />
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl font-bold">
+                {ep.title ?? ep.topic}
+              </CardTitle>
+              <CardDescription>{ep.topic}</CardDescription>
             </div>
-          ) : null}
-          {ep.status === "failed" ? (
-            <Alert variant="destructive">
-              <CircleAlertIcon />
-              <AlertTitle>This episode could not be generated</AlertTitle>
-              <AlertDescription>{ep.error ?? "Unknown error"}</AlertDescription>
-              <AlertAction>
-                <RetryButton episodeId={ep.id} />
-              </AlertAction>
-            </Alert>
-          ) : null}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            {inProgress ? (
+              <div className="grid gap-2">
+                <Progress value={STATUS_PROGRESS[ep.status]} />
+                <p className="text-sm text-muted-foreground">
+                  {STATUS_LABEL[ep.status]}… This page updates by itself. You’ll
+                  also get an email when it’s ready.
+                </p>
+              </div>
+            ) : null}
+            {ep.status === "failed" ? (
+              <Alert variant="destructive">
+                <CircleAlertIcon />
+                <AlertTitle>This episode could not be generated</AlertTitle>
+                <AlertDescription>
+                  {ep.error ?? "Unknown error"}
+                </AlertDescription>
+                <AlertAction>
+                  <RetryButton episodeId={ep.id} />
+                </AlertAction>
+              </Alert>
+            ) : null}
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue="script">
         <TabsList>
@@ -253,8 +250,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
 export default function EpisodePage({ params }: PageProps<"/episodes/[id]">) {
   return (
     <>
-      <SiteHeader />
-      <main className="mx-auto grid w-full max-w-3xl gap-6 px-4 py-8">
+      <div className="mx-auto grid w-full max-w-4xl gap-6">
         <Link
           href="/dashboard"
           className={buttonVariants({
@@ -277,7 +273,7 @@ export default function EpisodePage({ params }: PageProps<"/episodes/[id]">) {
         >
           <EpisodeContent params={params} />
         </Suspense>
-      </main>
+      </div>
     </>
   );
 }

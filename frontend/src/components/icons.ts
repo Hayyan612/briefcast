@@ -1,0 +1,47 @@
+/**
+ * Solar icons (480 Design, CC BY 4.0) for the whole app, including the shadcn
+ * primitives. Names keep the call-site vocabulary (PlayIcon, SearchIcon…) so a
+ * component never imports an icon set directly.
+ */
+export { PauseIcon, PlayIcon } from "@solar-icons/react/bold";
+export {
+  AddIcon as PlusIcon,
+  AltArrowDownIcon as ChevronDownIcon,
+  AltArrowLeftIcon as ArrowLeftIcon,
+  AltArrowRightIcon as ChevronRightIcon,
+  AltArrowUpIcon as ChevronUpIcon,
+  BookBookmarkIcon as BookOpenIcon,
+  CalendarIcon as CalendarClockIcon,
+  CheckCircleIcon as CircleCheckIcon,
+  CheckIcon,
+  ClockCircleIcon as ClockIcon,
+  CloseIcon as XIcon,
+  DangerCircleIcon as CircleAlertIcon,
+  DangerSquareIcon as OctagonXIcon,
+  DangerTriangleIcon as TriangleAlertIcon,
+  DocumentTextIcon as FileTextIcon,
+  HeadphonesRoundSoundIcon as HeadphonesIcon,
+  HomeSmileAngleIcon as HomeIcon,
+  InfoCircleIcon as InfoIcon,
+  LetterIcon as MailIcon,
+  LogoutIcon as LogOutIcon,
+  MenuDotsIcon as EllipsisIcon,
+  MenuDotsIcon as EllipsisVerticalIcon,
+  MicrophoneIcon as MicIcon,
+  MinimalisticMagnifierIcon as SearchIcon,
+  PenIcon as PencilIcon,
+  PlaybackSpeedIcon as GaugeIcon,
+  PodcastIcon as RadioIcon,
+  RefreshIcon as Loader2Icon,
+  RestartIcon as RotateCcwIcon,
+  Rewind15SecondsBackIcon as Rewind15BackIcon,
+  Rewind15SecondsForwardIcon as Rewind15ForwardIcon,
+  SidebarMinimalisticIcon as PanelLeftIcon,
+  SortVerticalIcon as ChevronsUpDownIcon,
+  SoundwaveIcon as AudioLinesIcon,
+  SquareArrowRightUpIcon as ExternalLinkIcon,
+  StarsIcon as SparklesIcon,
+  TrashBinMinimalisticIcon as Trash2Icon,
+  VolumeCrossIcon as VolumeXIcon,
+  VolumeLoudIcon as Volume2Icon,
+} from "@solar-icons/react/linear";
