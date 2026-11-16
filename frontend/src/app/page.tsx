@@ -73,6 +73,10 @@ const FAQ = [
     a: "No. It remembers what recent episodes covered and skips stories you have already heard, unless there is something new to say about them.",
   },
   {
+    q: "Can I change what I follow later?",
+    a: "Any time. Edit a briefing to add or remove interests or rewrite its brief, or browse Discover for new ones. The next episode follows the change.",
+  },
+  {
     q: "Which languages does it speak?",
     a: `${LANGUAGES.map((l) => l.label).join(", ")}. Research reads sources in English; the episode is written and spoken in the language you pick, with Gnani.ai voices.`,
   },
@@ -246,6 +250,13 @@ export default function Home({ searchParams }: PageProps<"/">) {
             width={578}
             height={594}
             caption="Mix up to six interests into one daily episode, from startups and markets to cricket and your city."
+          />
+          <Shot
+            src="/landing/discover.jpg"
+            alt="The Discover page: suggestions next to what you follow, and every interest by category"
+            width={1182}
+            height={500}
+            caption="Your interests can grow. Discover suggests more like what you follow, and adds any of them to a briefing in one tap."
           />
           <div className="grid gap-8 lg:grid-cols-2">
             <Shot
