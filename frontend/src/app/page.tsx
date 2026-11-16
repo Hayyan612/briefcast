@@ -8,7 +8,9 @@ import { auth, signIn } from "@/auth";
 import { BrandMark } from "@/components/brand";
 import { Faq } from "@/components/landing/faq";
 import { Morning } from "@/components/landing/morning";
-import { Landscape } from "@/components/landing/landscape";
+import { Landscape, SkyClock } from "@/components/landing/landscape";
+import { depth } from "@/components/landing/depth";
+import { Scene } from "@/components/landing/scene";
 import { SamplePlayer } from "@/components/landing/sample-player";
 import { FeatureSection, Shot, TwoTone } from "@/components/landing/sections";
 import { LinkButton } from "@/components/link-button";
@@ -168,9 +170,14 @@ export default function Home({ searchParams }: PageProps<"/">) {
             className="rise mx-auto grid w-full max-w-6xl gap-4 px-4 md:px-8"
             style={{ "--i": 3 } as React.CSSProperties}
           >
-            <div className="relative isolate overflow-hidden rounded-[28px] ring-1 ring-black/5 dark:ring-white/10 md:aspect-[16/9]">
-              <Landscape className="-z-10" />
-              <div className="absolute top-[8%] left-[4%] hidden w-[68%] overflow-hidden rounded-[12px] shadow-[0_40px_90px_-30px_rgb(10_20_60/0.65)] ring-1 ring-black/10 md:block dark:ring-white/15">
+            <Scene className="relative isolate overflow-hidden rounded-[28px] ring-1 ring-black/5 md:aspect-[16/9] dark:ring-white/10">
+              <div className="absolute -inset-4 -z-10" style={depth(-8, -6)}>
+                <Landscape />
+              </div>
+              <div
+                className="absolute top-[8%] left-[4%] hidden w-[68%] overflow-hidden rounded-[12px] shadow-[0_40px_90px_-30px_rgb(10_20_60/0.65)] ring-1 ring-black/10 md:block dark:ring-white/15"
+                style={depth(-14, -10)}
+              >
                 <Image
                   src="/landing/dashboard-light.jpg"
                   alt="The Briefcast dashboard with an episode playing and its live caption"
@@ -189,10 +196,14 @@ export default function Home({ searchParams }: PageProps<"/">) {
                   className="hidden h-auto w-full dark:block"
                 />
               </div>
-              <div className="p-4 pt-28 md:absolute md:right-[4%] md:bottom-[7%] md:w-[380px] md:p-0">
+              <div
+                className="p-4 pt-28 md:absolute md:right-[4%] md:bottom-[7%] md:w-[380px] md:p-0"
+                style={depth(18, 12)}
+              >
                 <SamplePlayer />
               </div>
-            </div>
+              <SkyClock className="absolute bottom-[6%] left-[4%] max-md:top-4 max-md:bottom-auto max-md:left-4 dark:hidden" />
+            </Scene>
             <p className="text-mac-body text-mac-label-secondary">
               Press play to hear two real Briefcast episodes, in English and
               Hindi. The words follow the voice.
