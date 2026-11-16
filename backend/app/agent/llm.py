@@ -32,16 +32,27 @@ def tool(name: str, description: str, properties: dict, required: list[str]) -> 
 async def call_forced_tool(
     client: AsyncOpenAI, messages: list[dict], spec: dict, temperature: float = 0.4
 ) -> dict[str, Any]:
-    """Ask the model for exactly one call of `spec` and return its parsed arguments."""
+    """Get exactly one call of `spec` and return its parsed arguments.
+
+    Some models (e.g. Claude Sonnet 5.5) reject a forced `tool_choice`, so we offer the
+    single tool with tool_choice="auto", and re-ask once if the model answers in prose.
+    """
     name = spec["function"]["name"]
-    resp = await client.chat.completions.create(
-        model=get_settings().llm_model,
-        messages=messages,
-        tools=[spec],
-        tool_choice={"type": "function", "function": {"name": name}},
-        temperature=temperature,
-    )
-    calls = resp.choices[0].message.tool_calls or []
-    if not calls:
-        raise RuntimeError(f"Model did not call {name}")
-    return json.loads(calls[0].function.arguments or "{}")
+    convo = [*messages, {"role": "user", "content": f"Respond by calling `{name}`."}]
+    for _ in range(2):
+        resp = await client.chat.completions.create(
+            model=get_settings().llm_model,
+            messages=convo,
+            tools=[spec],
+            tool_choice="auto",
+            temperature=temperature,
+        )
+        msg = resp.choices[0].message
+        for call in msg.tool_calls or []:
+            if call.function.name == name:
+                return json.loads(call.function.arguments or "{}")
+        convo += [
+            {"role": "assistant", "content": msg.content or ""},
+            {"role": "user", "content": f"Call the `{name}` tool now. No prose."},
+        ]
+    raise RuntimeError(f"Model did not call {name}")
