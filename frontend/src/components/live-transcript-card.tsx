@@ -46,7 +46,10 @@ export function LiveTranscriptCard() {
             <span className="text-mac-footnote font-semibold text-mac-accent max-md:hidden">
               Now playing · {track.title}
             </span>
-            <div className="relative grid gap-1" aria-live="off">
+            <div
+              className="relative grid h-[6.5rem] content-center gap-1 overflow-hidden"
+              aria-live="off"
+            >
               <AnimatePresence initial={false} mode="popLayout">
                 {window3.map((slot, pos) =>
                   slot ? (
@@ -58,16 +61,18 @@ export function LiveTranscriptCard() {
                       exit={{ opacity: 0, y: -14 }}
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                       className={cn(
-                        "line-clamp-2 text-mac-body",
-                        pos === 1 && index >= 0
-                          ? "text-[17px] leading-6 font-semibold text-mac-label"
-                          : "text-mac-label-secondary",
+                        pos === 1
+                          ? "line-clamp-2 h-12 text-[17px] leading-6 font-semibold text-mac-label"
+                          : "h-5 truncate text-mac-callout leading-5 text-mac-label-secondary",
                       )}
                     >
                       {slot.line.text}
                     </motion.p>
                   ) : (
-                    <span key={`empty-${pos}`} className="h-5" />
+                    <span
+                      key={`empty-${pos}`}
+                      className={pos === 1 ? "h-12" : "h-5"}
+                    />
                   ),
                 )}
               </AnimatePresence>

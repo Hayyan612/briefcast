@@ -12,6 +12,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { TranscriptLine } from "@/lib/types";
 
+function smoothScroll(): ScrollBehavior {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
+
 function clock(s: number) {
   const m = Math.floor(s / 60);
   return `${m}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
@@ -59,7 +65,7 @@ export function Transcript({
     const el = lineRefs.current[active];
     if (!el) return;
     programmatic.current = true;
-    el.scrollIntoView({ block: "center", behavior: "smooth" });
+    el.scrollIntoView({ block: "center", behavior: smoothScroll() });
     const t = setTimeout(() => (programmatic.current = false), 700);
     return () => clearTimeout(t);
   }, [active, following, isCurrent, player.playing]);
@@ -96,41 +102,72 @@ export function Transcript({
 
   return (
     <div ref={container} className={cn("relative", className)}>
-      <div className="grid gap-6">
-        {paragraphs.map((group) => (
-          <p
-            key={group.p}
-            className="text-[17px] leading-8 md:text-lg md:leading-9"
-          >
-            {group.items.map(({ line, i }) => {
-              const state = i === active ? "now" : i < active ? "past" : "next";
-              return (
-                <button
-                  key={i}
-                  ref={(el) => {
-                    lineRefs.current[i] = el;
-                  }}
-                  type="button"
-                  onClick={() => {
-                    setFollowing(true);
-                    player.play(track, line.start);
-                  }}
-                  aria-current={state === "now" ? "true" : undefined}
-                  aria-label={`Play from ${clock(line.start)}: ${line.text}`}
-                  className={cn(
-                    "inline rounded-md px-0.5 text-left transition-[color,background-color] duration-300 [box-decoration-break:clone] hover:bg-mac-fill-tertiary focus-visible:outline-2 focus-visible:outline-mac-accent",
-                    state === "now" &&
-                      "bg-mac-accent/12 font-semibold text-mac-label",
-                    state === "past" && "text-mac-label-secondary",
-                    state === "next" && "text-mac-label",
-                  )}
-                >
-                  {line.text}{" "}
-                </button>
-              );
-            })}
-          </p>
-        ))}
+      {!isCurrent ? (
+        <p className="mb-5 text-mac-footnote text-muted-foreground">
+          Tap any line to play from there.
+        </p>
+      ) : null}
+      <div className="grid gap-7">
+        {paragraphs.map((group) => {
+          const first = group.items[0].line;
+          const groupActive = group.items.some(({ i }) => i === active);
+          return (
+            <div
+              key={group.p}
+              className="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-3"
+            >
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-hidden
+                onClick={() => {
+                  setFollowing(true);
+                  player.play(track, first.start);
+                }}
+                className={cn(
+                  "mt-1.5 h-fit text-left text-mac-footnote tabular-nums transition-colors duration-300 hover:text-mac-accent",
+                  groupActive
+                    ? "font-semibold text-mac-accent"
+                    : "text-muted-foreground",
+                )}
+              >
+                {clock(first.start)}
+              </button>
+              <p className="text-[17px] leading-8 md:text-lg md:leading-9">
+                {group.items
+                  .map(({ line, i }) => {
+                    const state =
+                      i === active ? "now" : i < active ? "past" : "next";
+                    return (
+                      <button
+                        key={i}
+                        ref={(el) => {
+                          lineRefs.current[i] = el;
+                        }}
+                        type="button"
+                        onClick={() => {
+                          setFollowing(true);
+                          player.play(track, line.start);
+                        }}
+                        aria-current={state === "now" ? "true" : undefined}
+                        aria-label={`Play from ${clock(line.start)}: ${line.text}`}
+                        className={cn(
+                          // Colour only: changing weight would re-wrap lines as the highlight moves.
+                          "inline scroll-my-24 rounded-[5px] px-[3px] text-left [box-decoration-break:clone] transition-[color,background-color] duration-300 hover:bg-mac-fill-tertiary focus-visible:outline-2 focus-visible:outline-mac-accent",
+                          state === "now" && "bg-mac-accent/12 text-mac-label",
+                          state === "past" && "text-mac-label-secondary",
+                          state === "next" && "text-mac-label",
+                        )}
+                      >
+                        {line.text}
+                      </button>
+                    );
+                  })
+                  .flatMap((el, k) => (k === 0 ? [el] : [" ", el]))}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
       <AnimatePresence>
