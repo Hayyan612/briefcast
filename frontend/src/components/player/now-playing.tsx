@@ -30,10 +30,23 @@ function clock(seconds: number) {
   return formatDuration(Math.floor(seconds) || 0).replace("—", "0:00");
 }
 
+const OPEN_EVENT = "briefcast:open-now-playing";
+
+/** Open the Now Playing view from anywhere (player bar title, dashboard card…). */
+export function openNowPlaying() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
 /** Spotify-style full view: big cover and controls beside the live transcript. */
 export function NowPlaying() {
   const p = usePlayer();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener(OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_EVENT, onOpen);
+  }, []);
   const [detail, setDetail] = useState<EpisodeDetail | null>(null);
   const trackId = p.track?.id;
 

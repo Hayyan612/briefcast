@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import {
   GaugeIcon,
@@ -11,7 +10,8 @@ import {
 } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
-import { NowPlaying } from "@/components/player/now-playing";
+import { NowPlaying, openNowPlaying } from "@/components/player/now-playing";
+import { useLiveTranscript } from "@/components/player/use-live-transcript";
 import { PlayPauseGlyph } from "@/components/player/play-button";
 import { usePlayer } from "@/components/player/player-provider";
 import { Button } from "@/components/ui/button";
@@ -61,9 +61,11 @@ function PlayerBarInner() {
       className="overflow-hidden border-t bg-mac-window/95 backdrop-blur"
     >
       <div className="mx-auto grid h-[72px] max-w-screen-2xl grid-cols-[1fr_auto] items-center gap-4 px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
-        <Link
-          href={`/episodes/${p.track.id}`}
-          className="flex min-w-0 items-center gap-3"
+        <button
+          type="button"
+          onClick={openNowPlaying}
+          aria-label={`Open Now Playing: ${p.track.title}`}
+          className="flex min-w-0 items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-mac-accent"
         >
           <CoverArt
             topic={p.track.topic}
@@ -73,11 +75,9 @@ function PlayerBarInner() {
           />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{p.track.title}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {p.track.topic}
-            </p>
+            <LiveCaption fallback={p.track.topic} />
           </div>
-        </Link>
+        </button>
 
         <div className="flex flex-col items-center gap-1">
           <div className="flex items-center gap-2">
@@ -186,5 +186,27 @@ function PlayerBarInner() {
         />
       </div>
     </motion.div>
+  );
+}
+
+/** The sentence being spoken right now, as a one-line live caption. */
+function LiveCaption({ fallback }: { fallback: string }) {
+  const { lines, index } = useLiveTranscript();
+  const line = lines && index >= 0 ? lines[index] : null;
+  return (
+    <div className="relative h-4 overflow-hidden" aria-live="off">
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.p
+          key={line ? `${index}` : "topic"}
+          initial={{ y: 12, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -12, opacity: 0 }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="truncate text-xs text-muted-foreground"
+        >
+          {line ? line.text : fallback}
+        </motion.p>
+      </AnimatePresence>
+    </div>
   );
 }

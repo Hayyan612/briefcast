@@ -12,6 +12,7 @@ import { BriefingCard } from "@/components/briefing-card";
 import { BriefingDialog } from "@/components/briefing-dialog";
 import { EpisodeHero } from "@/components/episode-hero";
 import { EpisodesTable } from "@/components/episodes-table";
+import { LiveTranscriptCard } from "@/components/live-transcript-card";
 import { Onboarding } from "@/components/onboarding";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -82,6 +83,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
         </div>
       ) : null}
 
+      <LiveTranscriptCard />
       {latest ? <EpisodeHero episode={latest} /> : null}
 
       <div className="grid items-start gap-10 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-8">
