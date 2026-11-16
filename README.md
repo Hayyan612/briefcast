@@ -45,31 +45,116 @@
 
 ## Architecture
 
-```
- Browser ──► Next.js (web) ──────────────► FastAPI (api) ──► Postgres
-   │          Auth.js Google sign-in          │  ▲
-   │          /api/backend/* proxy            │  │ enqueue
-   │          (session cookie → 5-min JWT)    ▼  │
-   │                                        Redis (ARQ)
-   │                                           │
-   │                                           ▼
-   │                                     ARQ worker
-   │                          ┌── cron every minute: find due briefings
-   │                          └── generate_episode job:
-   │                                research agent ── Tavily search/extract
-   │                                script writer   ── LLM via OpenRouter
-   │                                TTS             ── Gnani.ai Timbre
-   │                                align + store   ── ffmpeg, Postgres
-   └──── email link ◄──────────────  mailer        ── SMTP
+> The diagrams render on GitHub: drag to pan, scroll or use the controls to zoom.
+
+```mermaid
+flowchart LR
+    user(["👤 Listener<br/>browser · email · podcast app"])
+
+    subgraph public["Public: briefcast.hayyan.space"]
+        web["<b>web</b><br/>Next.js 16<br/>Google sign-in (Auth.js)<br/>/api/backend/* proxy"]
+    end
+
+    subgraph private["Private network (never exposed)"]
+        api["<b>api</b><br/>FastAPI<br/>briefings · episodes<br/>audio · podcast feed"]
+        db[("<b>postgres</b><br/>users · briefings<br/>episodes · MP3 audio")]
+        redis[("<b>redis</b><br/>ARQ job queue")]
+        worker["<b>worker</b><br/>ARQ<br/>scheduler + pipeline"]
+    end
+
+    subgraph ext["External services"]
+        tavily["Tavily<br/>search · extract"]
+        llm["OpenRouter<br/>LLM"]
+        gnani["Gnani.ai<br/>Timbre TTS"]
+        smtp["SMTP<br/>episode email"]
+    end
+
+    user -- "session cookie" --> web
+    web -- "5-min HS256 JWT" --> api
+    api --> db
+    api -- "enqueue" --> redis
+    redis --> worker
+    worker --> db
+    worker --> tavily
+    worker --> llm
+    worker --> gnani
+    worker --> smtp
+    smtp -. "Listen now link" .-> user
+
+    classDef svc fill:#0071e3,stroke:#0058b0,color:#fff
+    classDef store fill:#e8f1fd,stroke:#0071e3,color:#0b2545
+    classDef extn fill:#f5f5f7,stroke:#8e8e93,color:#1d1d1f
+    class web,api,worker svc
+    class db,redis store
+    class tavily,llm,gnani,smtp extn
 ```
 
-| Service | Role |
-| --- | --- |
-| `web` | Next.js 16 with shadcn/ui and CupertinoUI. Google sign-in (Auth.js). The only public service. |
-| `api` | FastAPI. Briefings and episodes, audio streaming with Range support, the podcast feed. |
-| `worker` | ARQ worker. Runs the per-minute scheduler and the episode pipeline. |
-| `postgres` | Users, briefings, episodes, MP3 audio, voice samples. |
-| `redis` | ARQ job queue. |
+### One episode, start to finish
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Cron as Scheduler (every minute)
+    participant DB as Postgres
+    participant W as Worker
+    participant T as Tavily
+    participant L as LLM (OpenRouter)
+    participant G as Gnani.ai TTS
+    participant M as SMTP
+
+    Cron->>DB: due briefings (FOR UPDATE SKIP LOCKED)
+    Cron->>DB: insert episode (unique briefing + slot)
+    Cron->>W: enqueue generate_episode (job id episode:<id>)
+    W->>DB: load briefing, recent stories, source rules
+    loop Research agent (≤ 14 steps, ≤ 6 full reads)
+        W->>L: next tool call
+        L-->>W: search_web / read_source / finish_research
+        W->>T: search or extract
+        T-->>W: results registered as S1, S2, …
+    end
+    W->>DB: save findings + agent log
+    W->>L: write ~5-minute script from cited findings
+    L-->>W: script (one revision pass if length is off)
+    W->>DB: save script
+    loop Chunks of ≤ 450 characters, one at a time
+        W->>G: synthesise chunk
+        G-->>W: audio
+    end
+    W->>W: ffmpeg encode MP3, snap sentences to real pauses
+    W->>DB: save audio + aligned transcript
+    W->>M: email "New episode · Listen now"
+```
+
+### Episode states
+
+```mermaid
+stateDiagram-v2
+    [*] --> queued: scheduled time or "Make an episode now"
+    queued --> researching
+    researching --> writing
+    writing --> synthesizing
+    synthesizing --> ready
+    ready --> [*]
+    researching --> failed
+    writing --> failed
+    synthesizing --> failed
+    failed --> queued: Retry (skips stages already saved)
+```
+
+### Where each part lives
+
+| Part | What it does | Code |
+| --- | --- | --- |
+| `web` | Next.js 16 app, Google sign-in, the only public service | [`frontend/src/app`](frontend/src/app) |
+| Backend proxy | Turns the session into a 5-minute JWT for the API | [`frontend/src/app/api/backend`](frontend/src/app/api/backend) |
+| `api` | FastAPI routes, auth, audio streaming, podcast feed | [`backend/app/main.py`](backend/app/main.py), [`auth.py`](backend/app/auth.py) |
+| Scheduler | Finds due briefings, creates one episode per slot | [`backend/app/scheduling.py`](backend/app/scheduling.py), [`worker.py`](backend/app/worker.py) |
+| Research agent | Bounded tool-calling loop over Tavily | [`backend/app/agent/research.py`](backend/app/agent/research.py), [`context.py`](backend/app/agent/context.py) |
+| Script writer | Cited findings to a spoken ~5-minute script | [`backend/app/agent/script.py`](backend/app/agent/script.py) |
+| Voice | Gnani.ai TTS in chunks, retries, MP3 | [`backend/app/tts.py`](backend/app/tts.py) |
+| Transcript sync | Snaps sentence times to real pauses | [`backend/app/align.py`](backend/app/align.py) |
+| Email | Episode email with unsubscribe | [`backend/app/mailer.py`](backend/app/mailer.py) |
+| Data model | Users, briefings, episodes | [`backend/app/models.py`](backend/app/models.py) |
 
 ### Auth and data isolation
 
