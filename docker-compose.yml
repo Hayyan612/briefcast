@@ -1,5 +1,6 @@
-# Production stack. Only `web` is published; the API, worker, Postgres and Redis
-# stay on the internal network. The browser reaches the API through Next.js.
+# Production stack. Only `web` gets a domain (via the platform's reverse proxy); the API,
+# worker, Postgres and Redis stay on the internal network. The browser reaches the API
+# through Next.js. Secrets come from .env next to this file (see .env.example).
 services:
   web:
     build: ./frontend
@@ -12,7 +13,7 @@ services:
       BACKEND_URL: http://api:8000
       BACKEND_JWT_SECRET: ${BACKEND_JWT_SECRET}
     depends_on: [api]
-    ports: ["3000"]
+    expose: ["3000"]
 
   api:
     build: ./backend
