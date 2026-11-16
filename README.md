@@ -134,4 +134,4 @@ transitions (all of them respect `prefers-reduced-motion`).
 ## Credits
 
 - Layout inspired by [Free Podcast Player Web Design](https://www.figma.com/community/file/1247099379637461701/free-podcast-player-web-design) by wellrafi (CC BY 4.0).
-- Icons: [Solar](https://www.figma.com/community/file/1166831539721848736) by 480 Design (CC BY 4.0), via `@solar-icons/react`.
+- Icons: Solar by 480 Design (CC BY 4.0), via [`@solar-icons/react`](https://www.npmjs.com/package/@solar-icons/react) (MIT).
