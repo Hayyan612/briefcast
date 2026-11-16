@@ -26,7 +26,10 @@ STYLE = """Write for the ear, not the eye:
 - Write numbers, money and dates the way a host would say them: "two point five million
   dollars", "the twelfth of November", "twenty twenty six". No symbols like $, %, or +.
 - Attribute facts naturally ("according to TechCrunch"). Never invent facts, figures or
-  quotes; use only the findings provided. If coverage is thin, say so briefly and honestly.
+  quotes; use only the findings provided. If there is little news, say so briefly.
+- Never talk about the research process (search snippets, truncated articles, sources you
+  could not read). The coverage note is for you, not the listener: leave out or soften
+  claims it marks as weak instead of narrating the caveat.
 - Structure: a one-line cold open, a short welcome naming the topic and date, the stories
   grouped by theme with smooth transitions, then a two-sentence wrap-up.
 - No sign-off with a host name. Do not mention that you are an AI."""
