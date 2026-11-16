@@ -178,17 +178,61 @@ async def encode_mp3(pcm: bytes) -> bytes:
     return out
 
 
-async def synthesize_script(script: str, voice_key: str, language: str) -> tuple[bytes, int]:
-    """Return (mp3 bytes, duration in seconds)."""
+def seconds(pcm_len: int) -> float:
+    return pcm_len / 2 / SAMPLE_RATE
+
+
+def time_sentences(text: str, start: float, end: float, paragraph: int) -> list[dict]:
+    """Spread a chunk's exact audio span over its sentences, in proportion to their length."""
+    sentences = split_sentences(text) or [text]
+    total = sum(len(s) for s in sentences) or 1
+    out, t = [], start
+    for sentence in sentences:
+        span = (end - start) * len(sentence) / total
+        out.append(
+            {"start": round(t, 2), "end": round(t + span, 2), "text": sentence, "p": paragraph}
+        )
+        t += span
+    return out
+
+
+def approximate_transcript(script: str, duration: float) -> list[dict]:
+    """For episodes made before timings were recorded: spread the script over its length."""
+    paragraphs = [p for p in re.split(r"\n\s*\n", script) if p.strip()]
+    pause_total = PARAGRAPH_PAUSE_S * len(paragraphs)
+    speech = max(duration - pause_total, 1.0)
+    total_chars = sum(len(p) for p in paragraphs) or 1
+    out, t = [], 0.0
+    for i, para in enumerate(paragraphs):
+        span = speech * len(para) / total_chars
+        out += time_sentences(para.strip(), t, t + span, i)
+        t += span + PARAGRAPH_PAUSE_S
+    return out
+
+
+async def synthesize_script(
+    script: str, voice_key: str, language: str
+) -> tuple[bytes, int, list[dict]]:
+    """Return (mp3 bytes, duration in seconds, timed transcript).
+
+    Each chunk's start and end come from the exact PCM length synthesised so far, so the
+    transcript stays in sync with the audio; only positions inside a chunk are estimated.
+    """
     chunks = chunk_script(script)
     if not chunks:
         raise TTSError("Empty script")
     pcm = bytearray()
+    transcript: list[dict] = []
+    paragraph = 0
     async with httpx.AsyncClient() as client:
         tts = GnaniTTS(client, voice_key, language)
         for i, chunk in enumerate(chunks):
+            start = seconds(len(pcm))
             pcm += await tts.synth_pcm(chunk.text)
+            transcript += time_sentences(chunk.text, start, seconds(len(pcm)), paragraph)
             pcm += silence(PARAGRAPH_PAUSE_S if chunk.ends_paragraph else 0.12)
+            if chunk.ends_paragraph:
+                paragraph += 1
             log.debug("tts chunk %d/%d done", i + 1, len(chunks))
-    duration = round(len(pcm) / 2 / SAMPLE_RATE)
-    return await encode_mp3(bytes(pcm)), duration
+    duration = round(seconds(len(pcm)))
+    return await encode_mp3(bytes(pcm)), duration, transcript

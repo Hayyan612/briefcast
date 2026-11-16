@@ -190,6 +190,7 @@ class EpisodeDetail(EpisodeSummary):
     script: str | None
     sources: list[Source] | None
     research_log: list[dict] | None
+    transcript: list[dict] | None = None
     emailed_at: datetime | None
 
 

@@ -36,6 +36,7 @@ from app.schemas import (
     EpisodeSummary,
     Me,
 )
+from app.tts import approximate_transcript
 from app.voices import voice_supports
 
 
@@ -242,8 +243,12 @@ async def get_episode(
     episode_id: uuid.UUID,
     user: CurrentUser,
     session: DbSession,
-) -> Episode:
-    return await owned_episode(session, user, episode_id)
+) -> EpisodeDetail:
+    episode = await owned_episode(session, user, episode_id)
+    detail = EpisodeDetail.model_validate(episode)
+    if not detail.transcript and episode.script and episode.duration_seconds:
+        detail.transcript = approximate_transcript(episode.script, episode.duration_seconds)
+    return detail
 
 
 @app.post("/episodes/{episode_id}/retry", response_model=EpisodeSummary, status_code=202)

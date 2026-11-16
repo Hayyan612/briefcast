@@ -177,11 +177,14 @@ async def generate_episode(ctx: dict, episode_id_str: str) -> str:
 
         if not has_audio:
             await set_status(episode_id, EpisodeStatus.synthesizing)
-            mp3, duration = await synthesize_script(script, briefing.voice, briefing.language)
+            mp3, duration, transcript = await synthesize_script(
+                script, briefing.voice, briefing.language
+            )
             async with SessionLocal() as session, session.begin():
                 session.add(EpisodeAudio(episode_id=episode_id, data=mp3))
                 ep_row = await session.get(Episode, episode_id)
                 ep_row.duration_seconds = duration
+                ep_row.transcript = transcript
 
         await set_status(episode_id, EpisodeStatus.ready, completed_at=now_utc())
     except TTSError as exc:

@@ -119,6 +119,8 @@ class Episode(Base):
     research_log: Mapped[list | None] = mapped_column(JSONB)
     # Short statements of what this episode covered; later episodes avoid repeating them.
     findings: Mapped[list | None] = mapped_column(JSONB)
+    # Timed transcript: [{start, end, text, p}] in seconds, p = paragraph index.
+    transcript: Mapped[list | None] = mapped_column(JSONB)
     duration_seconds: Mapped[int | None] = mapped_column(Integer)
     error: Mapped[str | None] = mapped_column(Text)
     attempts: Mapped[int] = mapped_column(Integer, default=0)

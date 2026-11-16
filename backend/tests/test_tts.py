@@ -48,3 +48,13 @@ def test_hindi_danda_splits_sentences():
     assert len(chunks) > 1
     assert all(len(c.text) <= MAX_CHUNK_CHARS for c in chunks)
     assert all(c.text.endswith("।") for c in chunks)
+
+
+def test_time_sentences_spans_chunk_proportionally():
+    from app.tts import time_sentences
+
+    segs = time_sentences("Short one. A much longer second sentence here.", 10.0, 20.0, 2)
+    assert [s["p"] for s in segs] == [2, 2]
+    assert segs[0]["start"] == 10.0 and segs[-1]["end"] == 20.0
+    assert segs[0]["end"] == segs[1]["start"]
+    assert (segs[1]["end"] - segs[1]["start"]) > (segs[0]["end"] - segs[0]["start"])
