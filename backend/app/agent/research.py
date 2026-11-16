@@ -17,6 +17,7 @@ from tavily import AsyncTavilyClient
 
 from app.agent.llm import tool
 from app.config import get_settings
+from app.titles import source_title
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ class SourceRegistry:
     def add(self, title: str, url: str, published: str | None, snippet: str) -> Source:
         if url in self._by_url:
             return self._by_url[url]
-        src = Source(f"S{len(self._by_id) + 1}", title.strip(), url, published, snippet)
+        src = Source(f"S{len(self._by_id) + 1}", source_title(title, url), url, published, snippet)
         self._by_url[url] = src
         self._by_id[src.id] = src
         return src

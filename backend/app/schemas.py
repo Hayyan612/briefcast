@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime, time
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -9,6 +10,7 @@ from app.cover import COLORS, ICONS
 from app.models import EpisodeStatus, EpisodeTrigger
 from app.scheduling import validate_timezone
 from app.sources import LOOKBACKS, REGIONS, normalize_domains, normalize_url, normalize_watch_urls
+from app.titles import source_title
 from app.voices import DEFAULT_LANGUAGE, DEFAULT_VOICE, LANGUAGES, VOICES, voice_supports
 
 
@@ -184,6 +186,14 @@ class Source(BaseModel):
     title: str
     url: str
     published: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def readable_title(cls, data: Any) -> Any:
+        # Episodes stored before titles were cleaned still read well.
+        if isinstance(data, dict) and "url" in data:
+            return {**data, "title": source_title(data.get("title"), data["url"])}
+        return data
 
 
 class EpisodeDetail(EpisodeSummary):

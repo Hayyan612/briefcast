@@ -19,6 +19,7 @@ from tavily import AsyncTavilyClient
 
 from app.agent.research import ResearchPrefs, host_of
 from app.models import Briefing, BriefingLink, Episode, EpisodeStatus, WatchedPage
+from app.titles import title_from_text
 
 log = logging.getLogger(__name__)
 
@@ -76,14 +77,6 @@ def keep_real_articles(pages: list[dict]) -> list[dict]:
     return out
 
 
-def _title_from(content: str, url: str) -> str:
-    for line in content.splitlines():
-        line = line.strip("# ").strip()
-        if 12 <= len(line) <= 140:
-            return line
-    return url
-
-
 async def _memory(session: AsyncSession, briefing: Briefing, episode_id: uuid.UUID):
     since = datetime.now(UTC) - timedelta(days=MEMORY_DAYS)
     recent = (
@@ -117,7 +110,7 @@ async def _requested(session: AsyncSession, tavily: AsyncTavilyClient, briefing:
     pages = [
         {
             "url": link.url,
-            "title": link.title or _title_from(texts.get(link.url, ""), link.url),
+            "title": link.title or title_from_text(texts.get(link.url, ""), link.url),
             "content": texts.get(link.url, ""),
         }
         for link in links
@@ -184,7 +177,7 @@ async def _watched(
         texts = await _extract(tavily, candidates)
         pages += keep_real_articles(
             [
-                {"url": u, "title": _title_from(texts[u], u), "content": texts[u], "site": site}
+                {"url": u, "title": title_from_text(texts[u], u), "content": texts[u], "site": site}
                 for u in candidates
                 if texts.get(u)
             ]

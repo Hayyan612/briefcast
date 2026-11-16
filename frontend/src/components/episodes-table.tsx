@@ -73,7 +73,7 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                     className="size-9 rounded-[9px]"
                   />
                   <span className="grid min-w-0 gap-0.5">
-                    <span className="font-semibold group-hover:text-mac-accent max-md:line-clamp-2 md:truncate">
+                    <span className="font-semibold group-hover:text-mac-accent max-md:line-clamp-2 max-md:whitespace-normal md:truncate">
                       {title}
                     </span>
                     <span className="truncate text-mac-callout text-mac-label-secondary">

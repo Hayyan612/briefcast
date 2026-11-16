@@ -55,7 +55,7 @@ def episode_email(
     )
     logo = f"{get_settings().app_url.rstrip('/')}/brand/email-icon.png"
     font = "-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif"
-    html = f"""<!doctype html><html><head><meta name="color-scheme" content="light only"></head>
+    html = f"""<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"></head>
 <body style="margin:0;background:#f5f5f7;font-family:{font};color:#1d1d1f">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px">
