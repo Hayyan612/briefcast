@@ -85,6 +85,7 @@ class Source(BaseModel):
 class EpisodeDetail(EpisodeSummary):
     script: str | None
     sources: list[Source] | None
+    research_log: list[dict] | None
     emailed_at: datetime | None
 
 
