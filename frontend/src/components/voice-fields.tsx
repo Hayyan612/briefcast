@@ -61,7 +61,7 @@ export function VoiceFields({
           onValueChange={(v) => v && pickLanguage(v)}
         >
           <SelectTrigger className="w-full">
-            <LanguagesIcon className="shrink-0 text-muted-foreground" />
+            <LanguagesIcon className="mr-1.5 shrink-0 text-muted-foreground" />
             <SelectValue className="flex-1 text-left" />
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false} className="max-h-72">

@@ -13,6 +13,8 @@ export interface EpisodeSummary {
   completed_at: string | null;
   duration_seconds: number | null;
   error: string | null;
+  icon?: string | null;
+  color?: string | null;
 }
 
 export interface Source {
@@ -57,6 +59,8 @@ export interface Briefing {
   lookback: "day" | "week";
   finance_mode: boolean;
   watch_urls: string[];
+  icon: string | null;
+  color: string | null;
   pending_links: number;
   is_active: boolean;
   next_run_at: string;

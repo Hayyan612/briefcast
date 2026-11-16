@@ -15,6 +15,8 @@ export interface PlayerTrack {
   id: string;
   title: string;
   topic: string;
+  icon?: string | null;
+  color?: string | null;
 }
 
 interface PlayerState {

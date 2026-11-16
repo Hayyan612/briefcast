@@ -73,7 +73,12 @@ export function SidebarNav({
                     briefingId={b.id}
                     size="lg"
                   >
-                    <CoverArt topic={b.topic} className="size-8" />
+                    <CoverArt
+                      topic={b.topic}
+                      icon={b.icon}
+                      color={b.color}
+                      className="size-8"
+                    />
                     <span className="grid min-w-0 leading-tight">
                       <span className="truncate">{b.topic}</span>
                       <span className="truncate text-mac-footnote text-muted-foreground">

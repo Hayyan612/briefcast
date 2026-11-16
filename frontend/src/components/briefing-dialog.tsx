@@ -36,6 +36,7 @@ import {
   sourceDefaults,
   type SourceSettings,
 } from "@/components/source-fields";
+import { CoverPicker } from "@/components/cover-picker";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceFields } from "@/components/voice-fields";
@@ -87,7 +88,16 @@ export function BriefingDialog({
   const [emailEnabled, setEmailEnabled] = useState(
     briefing?.email_enabled ?? true,
   );
-  const [sources, setSources] = useState<SourceSettings>(() => sourceDefaults(briefing));
+  const [sources, setSources] = useState<SourceSettings>(() =>
+    sourceDefaults(briefing),
+  );
+  const [cover, setCover] = useState<{
+    icon: string | null;
+    color: string | null;
+  }>({
+    icon: briefing?.icon ?? null,
+    color: briefing?.color ?? null,
+  });
 
   const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
 
@@ -108,6 +118,8 @@ export function BriefingDialog({
         lookback: sources.lookback,
         finance_mode: sources.finance,
         watch_urls: splitList(sources.watch),
+        icon: cover.icon,
+        color: cover.color,
       });
       if (briefing) {
         await api(`/briefings/${briefing.id}`, { method: "PATCH", body });
@@ -200,6 +212,12 @@ export function BriefingDialog({
                 setLanguage(next.language);
                 setVoice(next.voice);
               }}
+            />
+            <CoverPicker
+              topic={topic}
+              icon={cover.icon}
+              color={cover.color}
+              onChange={setCover}
             />
             <SourceFields value={sources} onChange={setSources} />
             <Field orientation="horizontal">

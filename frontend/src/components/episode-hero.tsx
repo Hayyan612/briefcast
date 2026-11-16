@@ -28,6 +28,8 @@ export function EpisodeHero({
       <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center md:gap-8 md:p-8">
         <CoverArt
           topic={episode.topic}
+          icon={episode.icon}
+          color={episode.color}
           className="size-20 rounded-[18px] md:size-24 md:rounded-[22px]"
         />
         <div className="grid min-w-0 gap-2.5">
@@ -57,7 +59,13 @@ export function EpisodeHero({
             <PlayButton
               size="lg"
               label="Play episode"
-              track={{ id: episode.id, title, topic: episode.topic }}
+              track={{
+                id: episode.id,
+                title,
+                topic: episode.topic,
+                icon: episode.icon,
+                color: episode.color,
+              }}
             />
             {showOpen ? (
               <LinkButton

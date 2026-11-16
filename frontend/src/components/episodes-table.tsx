@@ -46,7 +46,13 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                   <PlayButton
                     size="icon-lg"
                     className="rounded-full"
-                    track={{ id: ep.id, title, topic: ep.topic }}
+                    track={{
+                      id: ep.id,
+                      title,
+                      topic: ep.topic,
+                      icon: ep.icon,
+                      color: ep.color,
+                    }}
                   />
                 ) : IN_PROGRESS.includes(ep.status) ? (
                   <Spinner className="mx-auto text-primary" />
@@ -59,7 +65,12 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                   href={`/episodes/${ep.id}`}
                   className="flex min-w-0 items-center gap-3.5 py-2"
                 >
-                  <CoverArt topic={ep.topic} className="size-9 rounded-[9px]" />
+                  <CoverArt
+                    topic={ep.topic}
+                    icon={ep.icon}
+                    color={ep.color}
+                    className="size-9 rounded-[9px]"
+                  />
                   <span className="grid min-w-0 gap-0.5">
                     <span className="truncate font-semibold group-hover:text-primary">
                       {title}

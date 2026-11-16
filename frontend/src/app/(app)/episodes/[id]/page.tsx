@@ -119,7 +119,12 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
       ) : (
         <Card>
           <CardHeader className="flex flex-row items-center gap-4">
-            <CoverArt topic={ep.topic} className="size-16" />
+            <CoverArt
+              topic={ep.topic}
+              icon={ep.icon}
+              color={ep.color}
+              className="size-16"
+            />
             <div className="grid gap-1">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge status={ep.status} />

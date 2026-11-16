@@ -128,7 +128,8 @@ export function BriefingCard({
           {briefing.pending_links ? (
             <Badge variant="outline">
               <LinkIcon data-icon="inline-start" />
-              {briefing.pending_links} {briefing.pending_links === 1 ? "link" : "links"} queued
+              {briefing.pending_links}{" "}
+              {briefing.pending_links === 1 ? "link" : "links"} queued
             </Badge>
           ) : null}
           {voiceLabel ? (

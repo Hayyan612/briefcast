@@ -64,7 +64,12 @@ function PlayerBarInner() {
           href={`/episodes/${p.track.id}`}
           className="flex min-w-0 items-center gap-3"
         >
-          <CoverArt topic={p.track.topic} className="size-12" />
+          <CoverArt
+            topic={p.track.topic}
+            icon={p.track.icon}
+            color={p.track.color}
+            className="size-12"
+          />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{p.track.title}</p>
             <p className="truncate text-xs text-muted-foreground">
