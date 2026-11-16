@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { resumeAt, savePosition } from "@/lib/positions";
+
 export interface PlayerTrack {
   id: string;
   title: string;
@@ -26,7 +28,8 @@ interface PlayerState {
   duration: number;
   rate: number;
   volume: number;
-  play: (track: PlayerTrack) => void;
+  /** Play a track, optionally from a given second (otherwise resume where left off). */
+  play: (track: PlayerTrack, startAt?: number) => void;
   toggle: () => void;
   seek: (seconds: number) => void;
   skip: (delta: number) => void;
@@ -48,20 +51,28 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [rate, setRateState] = useState(1);
   const [volume, setVolumeState] = useState(1);
+  const pendingSeek = useRef<number | null>(null);
+  const lastSaved = useRef(0);
 
   const play = useCallback(
-    (next: PlayerTrack) => {
+    (next: PlayerTrack, startAt?: number) => {
       const el = audio.current;
       if (!el) return;
       if (track?.id !== next.id) {
+        if (track && el.duration)
+          savePosition(track.id, el.currentTime, el.duration);
+        pendingSeek.current = startAt ?? resumeAt(next.id);
         el.src = `/api/backend/episodes/${next.id}/audio`;
         el.playbackRate = rate;
         setTrack(next);
-        setTime(0);
+        setTime(pendingSeek.current ?? 0);
+      } else if (startAt !== undefined) {
+        el.currentTime = startAt;
+        setTime(startAt);
       }
       void el.play();
     },
-    [track?.id, rate],
+    [track, rate],
   );
 
   const toggle = useCallback(() => {
@@ -99,7 +110,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const target = e.target as HTMLElement;
-      if (e.code !== "Space" || !track) return;
+      if (!track || !["Space", "ArrowLeft", "ArrowRight"].includes(e.code))
+        return;
       if (
         target.closest(
           "input, textarea, button, [role=slider], [contenteditable]",
@@ -107,11 +119,46 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       )
         return;
       e.preventDefault();
-      toggle();
+      if (e.code === "Space") toggle();
+      else skip(e.code === "ArrowLeft" ? -15 : 15);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [toggle, track]);
+  }, [toggle, skip, track]);
+
+  // Media Session: macOS Now Playing, media keys, headphones and phone lock screens.
+  useEffect(() => {
+    if (!("mediaSession" in navigator) || !track) return;
+    const ms = navigator.mediaSession;
+    ms.metadata = new MediaMetadata({
+      title: track.title,
+      artist: "Briefcast",
+      album: track.topic,
+    });
+    const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
+      ["play", () => void audio.current?.play()],
+      ["pause", () => audio.current?.pause()],
+      ["seekbackward", (d) => skip(-(d.seekOffset ?? 15))],
+      ["seekforward", (d) => skip(d.seekOffset ?? 15)],
+      ["seekto", (d) => d.seekTime !== undefined && seek(d.seekTime)],
+    ];
+    for (const [action, handler] of handlers) {
+      try {
+        ms.setActionHandler(action, handler);
+      } catch {
+        /* action not supported by this browser */
+      }
+    }
+    return () => {
+      for (const [action] of handlers) {
+        try {
+          ms.setActionHandler(action, null);
+        } catch {
+          /* ignore */
+        }
+      }
+    };
+  }, [track, skip, seek]);
 
   const value = useMemo(
     () => ({
@@ -151,10 +198,51 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         ref={audio}
         preload="metadata"
         onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => setPlaying(false)}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onPause={(e) => {
+          setPlaying(false);
+          if (track)
+            savePosition(
+              track.id,
+              e.currentTarget.currentTime,
+              e.currentTarget.duration,
+            );
+        }}
+        onEnded={(e) => {
+          setPlaying(false);
+          if (track)
+            savePosition(
+              track.id,
+              e.currentTarget.duration,
+              e.currentTarget.duration,
+            );
+        }}
+        onTimeUpdate={(e) => {
+          const el = e.currentTarget;
+          setTime(el.currentTime);
+          if (track && Math.abs(el.currentTime - lastSaved.current) >= 5) {
+            lastSaved.current = el.currentTime;
+            savePosition(track.id, el.currentTime, el.duration);
+          }
+          if ("mediaSession" in navigator && Number.isFinite(el.duration)) {
+            try {
+              navigator.mediaSession.setPositionState({
+                duration: el.duration,
+                position: Math.min(el.currentTime, el.duration),
+                playbackRate: el.playbackRate,
+              });
+            } catch {
+              /* ignore */
+            }
+          }
+        }}
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget;
+          setDuration(el.duration);
+          if (pendingSeek.current) {
+            el.currentTime = pendingSeek.current;
+            pendingSeek.current = null;
+          }
+        }}
         hidden
       />
     </PlayerContext.Provider>

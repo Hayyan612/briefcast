@@ -19,6 +19,7 @@ import { RetryButton } from "@/components/retry-button";
 import { CoverArt } from "@/components/cover-art";
 import { EpisodeHero } from "@/components/episode-hero";
 import { StatusBadge } from "@/components/status-badge";
+import { Transcript } from "@/components/transcript";
 import {
   Alert,
   AlertAction,
@@ -168,7 +169,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
         <TabsList>
           <TabsTrigger value="script">
             <FileTextIcon />
-            Script
+            Transcript
           </TabsTrigger>
           <TabsTrigger value="sources">
             <BookOpenIcon />
@@ -182,8 +183,19 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
 
         <TabsContent value="script">
           <Card>
-            <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-2 text-[15px] leading-7 text-mac-label">
-              {ep.script ? (
+            <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-4 text-[15px] leading-7 text-mac-label">
+              {ep.transcript?.length && ep.status === "ready" ? (
+                <Transcript
+                  track={{
+                    id: ep.id,
+                    title: ep.title ?? ep.topic,
+                    topic: ep.topic,
+                    icon: ep.icon,
+                    color: ep.color,
+                  }}
+                  lines={ep.transcript}
+                />
+              ) : ep.script ? (
                 ep.script.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)
               ) : (
                 <div className="grid gap-2">

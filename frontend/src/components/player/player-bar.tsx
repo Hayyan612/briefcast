@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
+import { NowPlaying } from "@/components/player/now-playing";
 import { PlayPauseGlyph } from "@/components/player/play-button";
 import { usePlayer } from "@/components/player/player-provider";
 import { Button } from "@/components/ui/button";
@@ -118,6 +119,7 @@ function PlayerBarInner() {
               </TooltipTrigger>
               <TooltipContent>Forward 15s</TooltipContent>
             </Tooltip>
+            <NowPlaying />
           </div>
           <div className="hidden w-full items-center gap-3 text-xs text-muted-foreground tabular-nums md:flex">
             <span className="w-10 text-right">{clock(p.time)}</span>

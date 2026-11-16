@@ -38,10 +38,18 @@ export interface ResearchStep {
   watched?: number;
 }
 
+export interface TranscriptLine {
+  start: number;
+  end: number;
+  text: string;
+  p: number;
+}
+
 export interface EpisodeDetail extends EpisodeSummary {
   script: string | null;
   sources: Source[] | null;
   research_log: ResearchStep[] | null;
+  transcript?: TranscriptLine[] | null;
   emailed_at: string | null;
 }
 

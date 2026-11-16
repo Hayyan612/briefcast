@@ -5,6 +5,7 @@ import { CircleAlertIcon } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
 import { EpisodeRowActions } from "@/components/episode-row-actions";
+import { ListenedBar } from "@/components/listened-bar";
 import { PlayButton } from "@/components/player/play-button";
 import { StatusBadge } from "@/components/status-badge";
 import { Spinner } from "@/components/ui/spinner";
@@ -79,6 +80,7 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                       {ep.topic} ·{" "}
                       {ep.trigger === "manual" ? "Run now" : "Scheduled"}
                     </span>
+                    <ListenedBar episodeId={ep.id} />
                   </span>
                 </Link>
               </TableCell>
