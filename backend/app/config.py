@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -36,7 +37,8 @@ class Settings(BaseSettings):
     smtp_host: str = "smtp-relay.brevo.com"
     smtp_port: int = 587
     smtp_username: str = ""
-    smtp_password: str = ""
+    # SMTP_KEY (as Brevo calls it) wins over SMTP_PASSWORD when both are set.
+    smtp_password: str = Field("", validation_alias=AliasChoices("SMTP_KEY", "SMTP_PASSWORD"))
     mail_from: str = "Briefcast <podcast@example.com>"
 
     # Product knobs
