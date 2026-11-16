@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { TranscriptLine } from "@/lib/types";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 interface Sample {
@@ -104,8 +105,10 @@ export function SamplePlayer({ className }: { className?: string }) {
     const el = audio.current;
     if (!el) return;
     // A blocked or failed start leaves the button showing Play rather than stuck.
-    if (el.paused) el.play().catch(() => setPlaying(false));
-    else el.pause();
+    if (el.paused) {
+      track("sample_play", { language: SAMPLES[key].lang });
+      el.play().catch(() => setPlaying(false));
+    } else el.pause();
   }
 
   const lines = sample?.transcript ?? [];

@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { MAX_PICKS, topicAfterAdding } from "@/lib/interests";
 import { notify as toast } from "@/lib/notify";
@@ -51,6 +52,7 @@ export function InterestChip({
           topic: topicAfterAdding(b, interest),
         }),
       });
+      track("interest_added", { interest });
       toast.success(`Added ${interest}`, {
         description: "It is in your next episode.",
       });

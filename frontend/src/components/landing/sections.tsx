@@ -51,7 +51,7 @@ export function FeatureSection({
     >
       {/* Pulled up so the first line's cap height, not its line box, meets the top of the
           first card. */}
-      <div className="md:sticky md:top-28 md:-mt-2.5 md:self-start">
+      <div className="reveal md:sticky md:top-28 md:-mt-2.5 md:self-start">
         <TwoTone lead={lead} rest={rest} />
       </div>
       <div className="grid gap-8">{children}</div>
@@ -82,7 +82,11 @@ export function Shot({
 }) {
   return (
     <figure
-      className={cn("grid gap-3", phone && "justify-items-center", className)}
+      className={cn(
+        "reveal grid gap-3",
+        phone && "justify-items-center",
+        className,
+      )}
     >
       <div
         className={cn(

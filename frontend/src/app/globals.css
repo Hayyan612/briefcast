@@ -166,3 +166,34 @@
     font-size: 16px !important;
   }
 }
+
+/* Landing page: in-page links glide instead of jumping (clear of the sticky header). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+html {
+  scroll-padding-top: 5rem;
+}
+
+/*
+ * Scroll-in reveal, driven by the scroll position itself (no JavaScript, always in step
+ * with the scroll). Where scroll timelines are unsupported, or motion is reduced,
+ * content is simply shown.
+ */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 28%;
+    }
+  }
+}

@@ -52,6 +52,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TimeSelect, TimezonePicker } from "@/components/schedule-fields";
 import { VoiceFields } from "@/components/voice-fields";
 import { useBrowserTimezone } from "@/hooks/use-browser-timezone";
+import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
 import { composeTopic, coverForPicks, MAX_PICKS } from "@/lib/interests";
@@ -144,6 +145,11 @@ export function Onboarding({
           lookback,
           email_enabled: emailEnabled,
         }),
+      });
+      track("onboarding_complete", {
+        interests: picks.length,
+        language,
+        region: region || "anywhere",
       });
       const episode = await api<EpisodeSummary>(
         `/briefings/${briefing.id}/run`,

@@ -42,6 +42,7 @@ import { composeTopic, isComposedTopic } from "@/lib/interests";
 import { TimeSelect, TimezonePicker } from "@/components/schedule-fields";
 import { VoiceFields } from "@/components/voice-fields";
 import { useBrowserTimezone } from "@/hooks/use-browser-timezone";
+import { track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { splitList } from "@/lib/sources";
 import type { Briefing, Voice } from "@/lib/types";
@@ -137,6 +138,7 @@ export function BriefingDialog({
         toast.success("Briefing updated");
       } else {
         await api("/briefings", { method: "POST", body });
+        track("briefing_created", { interests: picks.length, language });
         toast.success("Briefing scheduled", {
           description:
             "Choose “Make an episode now” from its menu to hear one right away.",

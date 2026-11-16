@@ -22,9 +22,12 @@ import { LANGUAGES } from "@/lib/languages";
 async function SignInCta({
   searchParams,
   size = "lg",
+  place,
 }: {
   searchParams: PageProps<"/">["searchParams"];
   size?: "default" | "lg";
+  /** Where the button is, for analytics ("nav", "hero", "closing"). */
+  place: string;
 }) {
   await connection(); // session reads are request-time; never prerender them
   const session = await auth();
@@ -37,7 +40,13 @@ async function SignInCta({
       : "/dashboard";
   if (session?.user) {
     return (
-      <LinkButton href={next} size={size} className="w-fit rounded-full">
+      <LinkButton
+        href={next}
+        size={size}
+        className="w-fit rounded-full"
+        data-umami-event="open_app"
+        data-umami-event-place={place}
+      >
         Open your briefings
       </LinkButton>
     );
@@ -48,7 +57,13 @@ async function SignInCta({
   }
   return (
     <form action={signInWithGoogle}>
-      <Button size={size} type="submit" className="rounded-full">
+      <Button
+        size={size}
+        type="submit"
+        className="rounded-full"
+        data-umami-event="sign_in_click"
+        data-umami-event-place={place}
+      >
         Continue with Google
       </Button>
     </form>
@@ -132,7 +147,11 @@ export default function Home({ searchParams }: PageProps<"/">) {
             </a>
             <ThemeToggle />
             <Suspense fallback={<Skeleton className="h-7 w-40 rounded-full" />}>
-              <SignInCta searchParams={searchParams} size="default" />
+              <SignInCta
+                searchParams={searchParams}
+                size="default"
+                place="nav"
+              />
             </Suspense>
           </div>
         </nav>
@@ -177,7 +196,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
               <Suspense
                 fallback={<Skeleton className="h-9 w-52 rounded-full" />}
               >
-                <SignInCta searchParams={searchParams} />
+                <SignInCta searchParams={searchParams} place="hero" />
               </Suspense>
               <p className="text-mac-body text-mac-label-secondary">
                 Pick what you follow and when. Nothing to install.
@@ -322,7 +341,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
           </div>
         </FeatureSection>
 
-        <section className="mx-auto w-full max-w-6xl px-4 md:px-8">
+        <section className="reveal mx-auto w-full max-w-6xl px-4 md:px-8">
           <TwoTone
             as="p"
             lead="Speaks"
@@ -352,7 +371,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
 
         <section
           id="faq"
-          className="mx-auto grid w-full max-w-6xl scroll-mt-24 gap-10 px-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 md:px-8"
+          className="reveal mx-auto grid w-full max-w-6xl scroll-mt-24 gap-10 px-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 md:px-8"
         >
           <TwoTone
             lead="Questions."
@@ -362,14 +381,14 @@ export default function Home({ searchParams }: PageProps<"/">) {
           <Faq items={FAQ} />
         </section>
 
-        <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 md:px-8">
+        <section className="reveal mx-auto grid w-full max-w-6xl gap-8 px-4 md:px-8">
           <TwoTone
             lead="Tomorrow at 8:00, your first episode."
             rest="Set it up in a minute."
             className="max-w-[18ch]"
           />
           <Suspense fallback={<Skeleton className="h-9 w-52 rounded-full" />}>
-            <SignInCta searchParams={searchParams} />
+            <SignInCta searchParams={searchParams} place="closing" />
           </Suspense>
         </section>
       </main>

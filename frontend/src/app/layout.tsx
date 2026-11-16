@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 
 import { ThemeProvider } from "next-themes";
 
+import { UmamiAnalytics } from "@/components/analytics/umami";
 import { MotionProvider } from "@/components/motion-provider";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <TooltipProvider>{children}</TooltipProvider>
           </MotionProvider>
           <Toaster />
+          <UmamiAnalytics />
         </ThemeProvider>
       </body>
     </html>

@@ -23,6 +23,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      data-umami-event="theme_toggle"
       onClick={() => setTheme(dark ? "light" : "dark")}
     >
       {dark ? <SunIcon /> : <MoonIcon />}

@@ -28,7 +28,7 @@ const STEPS = [
 
 export function Morning() {
   return (
-    <ol className="grid gap-px overflow-hidden rounded-[14px] bg-mac-separator ring-1 ring-black/5 sm:grid-cols-2 dark:ring-white/10">
+    <ol className="reveal grid gap-px overflow-hidden rounded-[14px] bg-mac-separator ring-1 ring-black/5 sm:grid-cols-2 dark:ring-white/10">
       {STEPS.map((s) => (
         <li key={s.time} className="grid content-start gap-2 bg-mac-window p-5">
           <span className="text-mac-callout font-semibold text-mac-accent tabular-nums">

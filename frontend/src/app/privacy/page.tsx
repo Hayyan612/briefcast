@@ -22,6 +22,10 @@ const SECTIONS = [
     body: "Your email is used to sign you in and to send you a link when an episode is ready. Your topics are sent to our research and language-model providers (Tavily, OpenRouter) to produce the script, and the script is sent to Gnani.ai to synthesise audio. Nothing is sold or used for advertising.",
   },
   {
+    title: "Analytics",
+    body: "We count visits and a few actions (such as playing the sample or finishing setup) with Umami, which we host ourselves at stats.hayyan.space. It uses no cookies, and these counts never include your name, email or topics.",
+  },
+  {
     title: "Who can see it",
     body: "Only you can see your briefings and episodes. Every request is checked against your account.",
   },

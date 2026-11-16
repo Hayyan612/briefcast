@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { track as trackEvent } from "@/lib/analytics";
 import { resumeAt, savePosition } from "@/lib/positions";
 
 export interface PlayerTrack {
@@ -61,6 +62,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       const el = audio.current;
       if (!el) return;
       if (track?.id !== next.id) {
+        trackEvent("episode_play");
         if (track && el.duration)
           savePosition(track.id, el.currentTime, el.duration);
         pendingSeek.current = startAt ?? resumeAt(next.id);
