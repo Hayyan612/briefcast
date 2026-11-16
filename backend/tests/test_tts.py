@@ -40,3 +40,11 @@ def test_halve_keeps_text():
 def test_read_pcm_roundtrip():
     frames = silence(0.1)
     assert read_pcm(make_wav(frames)) == frames
+
+
+def test_hindi_danda_splits_sentences():
+    hindi = "आज बाज़ार ऊपर गया। निवेशक खुश हैं। " * 30
+    chunks = chunk_script(hindi)
+    assert len(chunks) > 1
+    assert all(len(c.text) <= MAX_CHUNK_CHARS for c in chunks)
+    assert all(c.text.endswith("।") for c in chunks)

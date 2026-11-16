@@ -3,11 +3,11 @@
 import uuid
 from datetime import datetime, time
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models import EpisodeStatus, EpisodeTrigger
 from app.scheduling import validate_timezone
-from app.voices import DEFAULT_VOICE, VOICES
+from app.voices import DEFAULT_LANGUAGE, DEFAULT_VOICE, LANGUAGES, VOICES, voice_supports
 
 
 class BriefingIn(BaseModel):
@@ -15,6 +15,21 @@ class BriefingIn(BaseModel):
     delivery_time: time
     timezone: str = "Asia/Kolkata"
     voice: str = DEFAULT_VOICE
+    language: str = DEFAULT_LANGUAGE
+    email_enabled: bool = True
+
+    @field_validator("language")
+    @classmethod
+    def check_language(cls, v: str) -> str:
+        if v not in LANGUAGES:
+            raise ValueError("Unsupported language")
+        return v
+
+    @model_validator(mode="after")
+    def voice_speaks_language(self) -> "BriefingIn":
+        if not voice_supports(self.voice, self.language):
+            raise ValueError("This voice does not speak the chosen language")
+        return self
 
     @field_validator("topic")
     @classmethod
@@ -44,7 +59,16 @@ class BriefingPatch(BaseModel):
     delivery_time: time | None = None
     timezone: str | None = None
     voice: str | None = None
+    language: str | None = None
+    email_enabled: bool | None = None
     is_active: bool | None = None
+
+    @field_validator("language")
+    @classmethod
+    def check_language(cls, v: str | None) -> str | None:
+        if v is not None and v not in LANGUAGES:
+            raise ValueError("Unsupported language")
+        return v
 
     @field_validator("timezone")
     @classmethod
@@ -97,6 +121,8 @@ class BriefingOut(BaseModel):
     delivery_time: time
     timezone: str
     voice: str
+    language: str
+    email_enabled: bool
     is_active: bool
     next_run_at: datetime
     created_at: datetime

@@ -39,6 +39,7 @@ from app.models import (
 )
 from app.queue import GENERATE_EPISODE, enqueue_episode, redis_settings
 from app.scheduling import next_run_after
+from app.tokens import make_unsubscribe_token
 from app.tts import TTSError, synthesize_script
 
 log = logging.getLogger("briefcast.worker")
@@ -159,13 +160,13 @@ async def generate_episode(ctx: dict, episode_id_str: str) -> str:
                 research_log=research.log,
             )
             title, script = await write_script(
-                ctx["llm"], ep.topic, local_date, research, settings.target_words
+                ctx["llm"], ep.topic, local_date, research, settings.target_words, briefing.language
             )
             await set_status(episode_id, EpisodeStatus.writing, title=title, script=script)
 
         if not has_audio:
             await set_status(episode_id, EpisodeStatus.synthesizing)
-            mp3, duration = await synthesize_script(script, briefing.voice)
+            mp3, duration = await synthesize_script(script, briefing.voice, briefing.language)
             async with SessionLocal() as session, session.begin():
                 session.add(EpisodeAudio(episode_id=episode_id, data=mp3))
                 ep_row = await session.get(Episode, episode_id)
@@ -197,8 +198,13 @@ async def send_ready_email(episode_id: uuid.UUID) -> None:
     async with SessionLocal() as session:
         ep = await session.get(Episode, episode_id)
         user = await session.get(User, ep.user_id) if ep else None
-        if ep is None or user is None or ep.emailed_at is not None:
+        briefing = await session.get(Briefing, ep.briefing_id) if ep else None
+        if ep is None or user is None or briefing is None or ep.emailed_at is not None:
             return
+        if not briefing.email_enabled:
+            return
+        base = settings.app_url.rstrip("/")
+        unsubscribe_url = f"{base}/unsubscribe/{make_unsubscribe_token(briefing.id)}"
         subject, text, html = episode_email(
             user.name,
             ep.topic,
@@ -206,9 +212,10 @@ async def send_ready_email(episode_id: uuid.UUID) -> None:
             f"{settings.app_url.rstrip('/')}/episodes/{ep.id}",
             max(1, round((ep.duration_seconds or 0) / 60)),
             len(ep.sources or []),
+            unsubscribe_url,
         )
         try:
-            await send_mail(user.email, subject, text, html)
+            await send_mail(user.email, subject, text, html, unsubscribe_url)
         except Exception:
             log.exception("email for episode %s failed", episode_id)
             return

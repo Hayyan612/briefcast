@@ -7,6 +7,7 @@ from openai import AsyncOpenAI
 
 from app.agent.llm import call_forced_tool, tool
 from app.agent.research import ResearchResult
+from app.voices import LANGUAGES
 
 SUBMIT_SCRIPT = tool(
     "submit_script",
@@ -36,7 +37,26 @@ STYLE = """Write for the ear, not the eye:
 
 
 def word_count(text: str) -> int:
-    return len(re.findall(r"\b[\w'-]+\b", text))
+    # Whitespace split: \w would break Indic words apart at their vowel signs.
+    return len(text.split())
+
+
+def language_rules(language: str) -> str:
+    lang = LANGUAGES.get(language, LANGUAGES["en-IN"])
+    if language == "en-IN":
+        return ""
+    if language == "hi-en":
+        return (
+            "\nLanguage: Hinglish, the natural Hindi-English mix people speak in urban India. "
+            "Write Hindi words in Devanagari and English words, names and brands in Latin script. "
+            "Keep sentences conversational, the way a young Indian news host would talk."
+        )
+    return (
+        f"\nLanguage: write the entire script in {lang['label']} ({lang['native']}), in "
+        f"{lang['script']} script, as a native {lang['label']} news host would speak. "
+        "Keep company names, brands and people's names in their usual form. Write numbers, "
+        f"money and dates as spoken {lang['label']} words. The title must be in {lang['label']} too."
+    )
 
 
 def build_brief(topic: str, local_date: str, research: ResearchResult) -> str:
@@ -59,14 +79,19 @@ def _publisher(url: str) -> str:
 
 
 async def write_script(
-    llm: AsyncOpenAI, topic: str, local_date: str, research: ResearchResult, target_words: int
+    llm: AsyncOpenAI,
+    topic: str,
+    local_date: str,
+    research: ResearchResult,
+    target_words: int,
+    language: str = "en-IN",
 ) -> tuple[str, str]:
     brief = build_brief(topic, local_date, research)
     low, high = int(target_words * 0.85), int(target_words * 1.2)
     messages = [
         {
             "role": "system",
-            "content": f"You write scripts for a daily news podcast.\n{STYLE}\n"
+            "content": f"You write scripts for a daily news podcast.\n{STYLE}{language_rules(language)}\n"
             f"Length: {target_words} words (between {low} and {high}). That is about five "
             "minutes read aloud.",
         },

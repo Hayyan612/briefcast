@@ -38,6 +38,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     name: Mapped[str | None] = mapped_column(String(200))
     image: Mapped[str | None] = mapped_column(Text)
+    # Secret token for the user's private podcast feed. Rotating it revokes old links.
+    feed_token: Mapped[str | None] = mapped_column(String(64), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -53,6 +55,8 @@ class Briefing(Base):
     delivery_time: Mapped[time] = mapped_column(Time)
     timezone: Mapped[str] = mapped_column(String(64))
     voice: Mapped[str] = mapped_column(String(64))
+    language: Mapped[str] = mapped_column(String(8), default="en-IN", server_default="en-IN")
+    email_enabled: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     # Next due instant in UTC. The scheduler only ever compares this to now().
     next_run_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
@@ -121,3 +125,13 @@ class EpisodeAudio(Base):
     )
     mime_type: Mapped[str] = mapped_column(String(64), default="audio/mpeg")
     data: Mapped[bytes] = mapped_column(LargeBinary)
+
+
+class VoicePreview(Base):
+    """A short sample per (voice, language), generated once and reused."""
+
+    __tablename__ = "voice_previews"
+
+    key: Mapped[str] = mapped_column(String(96), primary_key=True)
+    data: Mapped[bytes] = mapped_column(LargeBinary)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -1,6 +1,5 @@
 """Briefcast HTTP API. Every query is scoped to the authenticated user."""
 
-import re
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
@@ -11,11 +10,15 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import distinct_on
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.audio import audio_response, slug_filename
 from app.auth import CurrentUser
 from app.config import get_settings
 from app.db import DbSession
 from app.models import Briefing, Episode, EpisodeAudio, EpisodeStatus, EpisodeTrigger, User
 from app.queue import enqueue_episode, make_pool
+from app.routes import feed as feed_routes
+from app.routes import public as public_routes
+from app.routes import voices as voices_routes
 from app.scheduling import next_run_after
 from app.schemas import (
     BriefingIn,
@@ -25,7 +28,7 @@ from app.schemas import (
     EpisodeSummary,
     Me,
 )
-from app.voices import VOICES
+from app.voices import voice_supports
 
 
 @asynccontextmanager
@@ -36,6 +39,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Briefcast API", lifespan=lifespan)
+app.include_router(voices_routes.router)
+app.include_router(feed_routes.router)
+app.include_router(public_routes.router)
 
 
 def now_utc() -> datetime:
@@ -68,11 +74,6 @@ async def health() -> dict:
 @app.get("/me", response_model=Me)
 async def me(user: CurrentUser) -> User:
     return user
-
-
-@app.get("/voices")
-async def voices() -> list[dict]:
-    return [{"id": key, **meta} for key, meta in VOICES.items()]
 
 
 # ---------- briefings ----------
@@ -122,6 +123,8 @@ async def create_briefing(
         delivery_time=body.delivery_time,
         timezone=body.timezone,
         voice=body.voice,
+        language=body.language,
+        email_enabled=body.email_enabled,
         next_run_at=next_run_after(body.delivery_time, body.timezone, now_utc()),
     )
     session.add(briefing)
@@ -146,6 +149,10 @@ async def update_briefing(
     for field, value in changes.items():
         if value is not None:
             setattr(briefing, field, value)
+    if not voice_supports(briefing.voice, briefing.language):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "This voice does not speak the chosen language"
+        )
     if {"delivery_time", "timezone", "is_active"} & changes.keys():
         briefing.next_run_at = next_run_after(briefing.delivery_time, briefing.timezone, now_utc())
     await session.commit()
@@ -250,36 +257,18 @@ async def retry_episode(
     return episode
 
 
-RANGE_RE = re.compile(r"bytes=(\d*)-(\d*)")
-
-
 @app.get("/episodes/{episode_id}/audio")
 async def episode_audio(
     episode_id: uuid.UUID,
     user: CurrentUser,
     session: DbSession,
+    download: bool = False,
     range_header: Annotated[str | None, Header(alias="range")] = None,
 ) -> Response:
-    """Serve the MP3, honouring Range requests so the player can seek."""
-    await owned_episode(session, user, episode_id)
+    """Serve the MP3 (Range-aware, so players can seek). ?download=1 saves it as a file."""
+    episode = await owned_episode(session, user, episode_id)
     audio = await session.get(EpisodeAudio, episode_id)
     if audio is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Audio not ready")
-    data, size = audio.data, len(audio.data)
-    headers = {"Accept-Ranges": "bytes", "Cache-Control": "private, max-age=3600"}
-
-    match = RANGE_RE.fullmatch(range_header.strip()) if range_header else None
-    if not match or (not match.group(1) and not match.group(2)):
-        return Response(data, media_type=audio.mime_type, headers=headers)
-
-    start_s, end_s = match.groups()
-    if start_s:
-        start, end = int(start_s), min(int(end_s) if end_s else size - 1, size - 1)
-    else:  # suffix range: last N bytes
-        start, end = max(size - int(end_s), 0), size - 1
-    if start > end or start >= size:
-        return Response(status_code=416, headers={"Content-Range": f"bytes */{size}"})
-    headers["Content-Range"] = f"bytes {start}-{end}/{size}"
-    return Response(
-        data[start : end + 1], status_code=206, media_type=audio.mime_type, headers=headers
-    )
+    filename = slug_filename(episode.title, "briefcast-episode") if download else None
+    return audio_response(audio.data, audio.mime_type, range_header, filename=filename)

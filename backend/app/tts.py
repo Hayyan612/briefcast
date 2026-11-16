@@ -40,8 +40,12 @@ class Chunk:
     ends_paragraph: bool
 
 
+# Sentence ends in Latin and Indic scripts: . ! ? plus the danda (।) and double danda (॥).
+SENTENCE_END = re.compile(r"(?<=[.!?\u0964\u0965])\s+")
+
+
 def split_sentences(paragraph: str) -> list[str]:
-    parts = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"'])", paragraph.strip())
+    parts = SENTENCE_END.split(paragraph.strip())
     return [p.strip() for p in parts if p.strip()]
 
 
@@ -85,9 +89,10 @@ def halve(text: str) -> tuple[str, str]:
 
 
 class GnaniTTS:
-    def __init__(self, client: httpx.AsyncClient, voice_key: str) -> None:
+    def __init__(self, client: httpx.AsyncClient, voice_key: str, language: str) -> None:
         self.client = client
-        self.model, self.voice, self.language = split_voice(voice_key)
+        self.model, self.voice = split_voice(voice_key)
+        self.language = language
         self.settings = get_settings()
 
     async def _request(self, text: str) -> bytes:
@@ -173,14 +178,14 @@ async def encode_mp3(pcm: bytes) -> bytes:
     return out
 
 
-async def synthesize_script(script: str, voice_key: str) -> tuple[bytes, int]:
+async def synthesize_script(script: str, voice_key: str, language: str) -> tuple[bytes, int]:
     """Return (mp3 bytes, duration in seconds)."""
     chunks = chunk_script(script)
     if not chunks:
         raise TTSError("Empty script")
     pcm = bytearray()
     async with httpx.AsyncClient() as client:
-        tts = GnaniTTS(client, voice_key)
+        tts = GnaniTTS(client, voice_key, language)
         for i, chunk in enumerate(chunks):
             pcm += await tts.synth_pcm(chunk.text)
             pcm += silence(PARAGRAPH_PAUSE_S if chunk.ends_paragraph else 0.12)
