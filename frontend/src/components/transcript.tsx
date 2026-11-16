@@ -160,7 +160,7 @@ export function Transcript({
         tabIndex={-1}
         className="lyrics-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 md:px-8"
       >
-        <ol className="grid gap-3 py-[30%] md:gap-4">
+        <ol className="grid gap-3 pt-4 pb-[45%] md:gap-4">
           {lines.map((line, i) => {
             const state = i === active ? "now" : i < active ? "past" : "next";
             const paragraphStart = i > 0 && lines[i - 1].p !== line.p;

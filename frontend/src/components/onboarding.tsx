@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/field";
 import { InterestPicker } from "@/components/interest-picker";
 import { OnboardingSources } from "@/components/onboarding-sources";
-import { Input } from "@/components/ui/input";
 import {
   Item,
   ItemContent,
@@ -47,21 +46,12 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { TimeSelect, TimezonePicker } from "@/components/schedule-fields";
 import { VoiceFields } from "@/components/voice-fields";
-import {
-  timezoneOptions,
-  useBrowserTimezone,
-} from "@/hooks/use-browser-timezone";
+import { useBrowserTimezone } from "@/hooks/use-browser-timezone";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
 import { composeTopic, coverForPicks, MAX_PICKS } from "@/lib/interests";
@@ -126,7 +116,6 @@ export function Onboarding({
   const [lookback, setLookback] = useState<Lookback>("day");
   const [emailEnabled, setEmailEnabled] = useState(true);
 
-  const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
   const voiceItems = useMemo(
     () => Object.fromEntries(voices.map((v) => [v.id, v.label])),
     [voices],
@@ -204,8 +193,9 @@ export function Onboarding({
                     {first ? `Welcome, ${first}` : "Welcome to Briefcast"}
                   </CardTitle>
                   <CardDescription className="text-mac-title-3">
-                    Pick a topic and a time. Every day you get a five-minute
-                    podcast on it, researched from that day’s sources.
+                    Pick what you’re into and a time. Every day you get a
+                    five-minute podcast on it, researched from that day’s
+                    sources.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -333,33 +323,24 @@ export function Onboarding({
                     <div className="grid gap-4 sm:grid-cols-[9rem_1fr]">
                       <Field>
                         <FieldLabel htmlFor="ob-time">Daily at</FieldLabel>
-                        <Input
+
+                        <TimeSelect
                           id="ob-time"
-                          type="time"
                           value={time}
-                          onChange={(e) => setTime(e.target.value)}
+                          onChange={setTime}
                         />
                       </Field>
+
                       <Field>
-                        <FieldLabel>Timezone</FieldLabel>
-                        <Select
+                        <FieldLabel htmlFor="ob-time-zone">Timezone</FieldLabel>
+
+                        <TimezonePicker
+                          id="ob-time-zone"
+
                           value={timezone}
-                          onValueChange={(v) => v && setTimezone(v)}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent
-                            alignItemWithTrigger={false}
-                            className="max-h-72"
-                          >
-                            {timezones.map((tz) => (
-                              <SelectItem key={tz} value={tz}>
-                                {tz.replaceAll("_", " ")}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+
+                          onChange={setTimezone}
+                        />
                       </Field>
                     </div>
                     <VoiceFields

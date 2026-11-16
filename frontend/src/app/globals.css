@@ -135,3 +135,18 @@
 .lyrics-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Same type everywhere: San Francisco on Apple devices, Inter (bundled) elsewhere,
+   instead of Segoe UI on Windows and Roboto on Android. */
+:root {
+  --font-macos: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro",
+    var(--font-inter), "Helvetica Neue", system-ui, sans-serif;
+}
+
+/* Touch screens: 16px fields, or iOS Safari zooms the page when one is focused. */
+@media (pointer: coarse) {
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
+}

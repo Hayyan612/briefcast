@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { CheckIcon, PlusIcon, XIcon } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 import { IconTile } from "@/components/ui/icon-tile";
 import { SearchField } from "@/components/ui/search-field";
 import { Toggle } from "@/components/ui/toggle";
@@ -42,12 +43,10 @@ export function InterestPicker({
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const t = setTimeout(() => {
-      document
-        .getElementById(`interests-${newest}`)
-        ?.scrollIntoView({
-          block: "nearest",
-          behavior: reduce ? "auto" : "smooth",
-        });
+      document.getElementById(`interests-${newest}`)?.scrollIntoView({
+        block: "nearest",
+        behavior: reduce ? "auto" : "smooth",
+      });
     }, 60);
     return () => clearTimeout(t);
   }, [newest]);
@@ -78,18 +77,42 @@ export function InterestPicker({
 
   return (
     <div className="grid gap-5">
-      <SearchField
-        aria-label="Search interests or type your own"
-        placeholder="Search, or type anything you want to follow"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            addCustom();
-          }
-        }}
-      />
+      <div className="grid gap-1.5">
+        <div className="relative">
+          <SearchField
+            size="xl"
+            aria-label="Search interests or add your own"
+            placeholder="Search topics, or type anything to follow"
+            enterKeyHint="done"
+            className="pr-9"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addCustom();
+              }
+              if (e.key === "Escape") setQuery("");
+            }}
+          />
+          {query ? (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Clear search"
+              className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full"
+              onClick={() => setQuery("")}
+            >
+              <XIcon />
+            </Button>
+          ) : null}
+        </div>
+        {canAddCustom ? (
+          <p className="text-mac-callout text-mac-label-secondary">
+            Press Return to add “{custom}” to your mix.
+          </p>
+        ) : null}
+      </div>
 
       <AnimatePresence initial={false}>
         {picks.length ? (
@@ -157,7 +180,7 @@ export function InterestPicker({
         </section>
       ) : (
         <section aria-label="Browse categories" className="grid gap-4">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-3 gap-2">
             {INTEREST_CATEGORIES.map((c) => {
               const { Icon } = COVER_ICONS[c.icon];
               const count = c.interests.filter((i) => picks.includes(i)).length;
@@ -171,7 +194,7 @@ export function InterestPicker({
                       on ? [c.id, ...open] : open.filter((o) => o !== c.id),
                     )
                   }
-                  className="h-auto justify-start gap-2.5 rounded-mac-item p-2.5 text-left whitespace-normal data-pressed:text-mac-label"
+                  className="relative h-auto justify-start gap-2.5 rounded-mac-item p-2.5 text-left whitespace-normal data-pressed:text-mac-label max-sm:flex-col max-sm:items-start max-sm:gap-2"
                 >
                   <IconTile color={c.color} size="lg">
                     <Icon />
@@ -180,7 +203,7 @@ export function InterestPicker({
                     {c.label}
                   </span>
                   {count ? (
-                    <span className="grid size-5 place-items-center rounded-full bg-mac-accent text-mac-caption font-semibold text-white tabular-nums">
+                    <span className="grid size-5 place-items-center rounded-full bg-mac-accent max-sm:absolute max-sm:top-2 max-sm:right-2 text-mac-caption font-semibold text-white tabular-nums">
                       {count}
                     </span>
                   ) : null}

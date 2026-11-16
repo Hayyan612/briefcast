@@ -76,7 +76,7 @@ export function NowPlaying() {
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="flex h-[92svh] flex-col gap-0 overflow-hidden rounded-t-mac-window p-0 sm:max-w-none"
+        className="flex h-[94svh] flex-col gap-0 overflow-hidden rounded-t-mac-window p-0 sm:max-w-none"
       >
         <header className="relative flex h-12 shrink-0 items-center justify-between border-b border-mac-separator px-4 md:px-6">
           <span
@@ -98,19 +98,24 @@ export function NowPlaying() {
             <ChevronDownIcon />
           </SheetClose>
         </header>
-        <div className="grid min-h-0 flex-1 md:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
-          <section className="flex flex-col gap-6 border-b p-6 md:border-r md:border-b-0 md:p-10">
-            <CoverArt
-              topic={track.topic}
-              icon={track.icon}
-              color={track.color}
-              className="size-40 rounded-[36px] [&_svg]:size-[50%]! max-md:mx-auto md:size-64 md:rounded-[56px]"
-            />
-            <div className="grid gap-1 max-md:text-center">
-              <SheetTitle className="text-mac-title-2 font-bold text-balance">
-                {track.title}
-              </SheetTitle>
-              <SheetDescription>{track.topic}</SheetDescription>
+        <div className="grid min-h-0 flex-1 max-md:grid-rows-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+          {/* Phones: the transcript gets the screen and the player sits under it as a compact strip. */}
+          <section className="flex flex-col gap-3 border-t border-mac-separator p-4 pb-[max(1rem,env(safe-area-inset-bottom))] max-md:order-last md:gap-6 md:border-t-0 md:border-r md:p-10">
+            <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-6">
+              <CoverArt
+                topic={track.topic}
+                icon={track.icon}
+                color={track.color}
+                className="size-12 shrink-0 rounded-[12px] [&_svg]:size-[50%]! md:size-64 md:rounded-[56px]"
+              />
+              <div className="grid min-w-0 gap-0.5 md:gap-1">
+                <SheetTitle className="line-clamp-2 text-mac-headline font-bold md:text-mac-title-2 md:text-balance">
+                  {track.title}
+                </SheetTitle>
+                <SheetDescription className="truncate max-md:text-mac-callout">
+                  {track.topic}
+                </SheetDescription>
+              </div>
             </div>
             <div className="grid gap-2">
               <Slider
@@ -125,7 +130,7 @@ export function NowPlaying() {
                 <span>-{clock(Math.max(p.duration - p.time, 0))}</span>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-4 md:gap-6">
               <Button
                 variant="ghost"
                 size="icon-xl"
@@ -136,7 +141,7 @@ export function NowPlaying() {
               </Button>
               <Button
                 size="icon-xl"
-                className="size-16 rounded-full [&_svg]:size-7!"
+                className="size-12 rounded-full [&_svg]:size-6! md:size-16 md:[&_svg]:size-7!"
                 aria-label={p.playing ? "Pause" : "Play"}
                 onClick={p.toggle}
               >
@@ -159,7 +164,7 @@ export function NowPlaying() {
               Sources and agent log
             </Link>
           </section>
-          <section className="min-h-0 p-4 md:p-6">
+          <section className="min-h-0 p-2 md:p-6">
             {detail?.id === track.id && detail.transcript?.length ? (
               <Transcript
                 track={track}

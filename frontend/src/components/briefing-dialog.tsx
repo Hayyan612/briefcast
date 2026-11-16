@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
 import { notify as toast } from "@/lib/notify";
 
@@ -22,14 +22,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import {
   SourceFields,
@@ -39,11 +31,9 @@ import {
 import { CoverPicker } from "@/components/cover-picker";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { TimeSelect, TimezonePicker } from "@/components/schedule-fields";
 import { VoiceFields } from "@/components/voice-fields";
-import {
-  timezoneOptions,
-  useBrowserTimezone,
-} from "@/hooks/use-browser-timezone";
+import { useBrowserTimezone } from "@/hooks/use-browser-timezone";
 import { api } from "@/lib/api";
 import { splitList } from "@/lib/sources";
 import type { Briefing, Voice } from "@/lib/types";
@@ -98,8 +88,6 @@ export function BriefingDialog({
     icon: briefing?.icon ?? null,
     color: briefing?.color ?? null,
   });
-
-  const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -174,34 +162,20 @@ export function BriefingDialog({
             <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
               <Field>
                 <FieldLabel htmlFor="time">Daily at</FieldLabel>
-                <Input
-                  id="time"
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  required
-                />
+
+                <TimeSelect id="time" value={time} onChange={setTime} />
               </Field>
+
               <Field>
-                <FieldLabel>Timezone</FieldLabel>
-                <Select
+                <FieldLabel htmlFor="time-zone">Timezone</FieldLabel>
+
+                <TimezonePicker
+                  id="time-zone"
+
                   value={timezone}
-                  onValueChange={(v) => v && setTimezone(v)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    alignItemWithTrigger={false}
-                    className="max-h-72"
-                  >
-                    {timezones.map((tz) => (
-                      <SelectItem key={tz} value={tz}>
-                        {tz.replaceAll("_", " ")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+                  onChange={setTimezone}
+                />
               </Field>
             </div>
             <VoiceFields

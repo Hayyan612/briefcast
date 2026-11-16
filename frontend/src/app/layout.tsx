@@ -1,9 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 
 import { MotionProvider } from "@/components/motion-provider";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
+
+// Closest match to San Francisco, for devices that do not have it (Windows, Android,
+// Linux). Apple devices keep the system font; see --font-macos in globals.css.
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   colorScheme: "light",
@@ -18,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <MotionProvider>
           <TooltipProvider>{children}</TooltipProvider>
