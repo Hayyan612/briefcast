@@ -115,7 +115,7 @@ export function BriefingDialog({
       } else {
         await api("/briefings", { method: "POST", body });
         toast.success("Briefing scheduled", {
-          description: "Use “Run now” to hear one right away.",
+          description: "Choose “Make an episode now” from its menu to hear one right away.",
         });
         setTopic("");
       }

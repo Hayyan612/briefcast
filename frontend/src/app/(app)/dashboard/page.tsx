@@ -8,7 +8,7 @@ import { HeadphonesIcon, PlusIcon, XIcon } from "@/components/icons";
 
 import { auth } from "@/auth";
 import { AutoRefresh } from "@/components/auto-refresh";
-import { BriefingCard } from "@/components/briefing-card";
+import { BriefingRow } from "@/components/briefing-row";
 import { BriefingDialog } from "@/components/briefing-dialog";
 import { EpisodeHero } from "@/components/episode-hero";
 import { EpisodesTable } from "@/components/episodes-table";
@@ -65,6 +65,12 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
   const latest = episodes.find((e) => e.status === "ready");
   const generating = allEpisodes.some((e) => IN_PROGRESS.includes(e.status));
   const shownBriefings = selected ? [selected] : briefings;
+  // Soonest delivery first; paused briefings last.
+  const upNext = [...shownBriefings].sort(
+    (a, b) =>
+      Number(b.is_active) - Number(a.is_active) ||
+      a.next_run_at.localeCompare(b.next_run_at),
+  );
   // Development-only: `?onboarding=1` previews the first-run flow with an existing account.
   const previewOnboarding =
     process.env.NODE_ENV !== "production" && one(params.onboarding) === "1";
@@ -117,7 +123,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
                     <EmptyDescription>
                       {q
                         ? "Try a different search."
-                        : "Use “Run now” on a briefing to hear the first episode in about two minutes."}
+                        : "Choose “Make an episode now” from a briefing’s menu to hear one in about two minutes."}
                     </EmptyDescription>
                   </EmptyHeader>
                 </Empty>
@@ -128,7 +134,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
 
         <aside className="grid min-w-0 gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-mac-title-2 font-bold">Coming up</h2>
+            <h2 className="text-mac-title-2 font-bold">Up next</h2>
             <BriefingDialog
               voices={voices}
               trigger={
@@ -139,15 +145,16 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
               }
             />
           </div>
-          {shownBriefings.map((b, i) => (
-            <div
-              key={b.id}
-              className="rise min-w-0"
-              style={{ "--i": i + 2 } as React.CSSProperties}
-            >
-              <BriefingCard briefing={b} voices={voices} />
-            </div>
-          ))}
+          <Card
+            className="rise py-0"
+            style={{ "--i": 2 } as React.CSSProperties}
+          >
+            <ul className="divide-y divide-mac-separator">
+              {upNext.map((b) => (
+                <BriefingRow key={b.id} briefing={b} voices={voices} />
+              ))}
+            </ul>
+          </Card>
         </aside>
       </div>
     </div>

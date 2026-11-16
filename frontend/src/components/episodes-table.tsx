@@ -78,7 +78,7 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                     </span>
                     <span className="truncate text-mac-callout text-mac-label-secondary">
                       {ep.topic} ·{" "}
-                      {ep.trigger === "manual" ? "Run now" : "Scheduled"}
+                      {ep.trigger === "manual" ? "On demand" : "Scheduled"}
                     </span>
                     <ListenedBar episodeId={ep.id} />
                   </span>
