@@ -8,14 +8,51 @@ import {
   usePlayer,
   type PlayerTrack,
 } from "@/components/player/player-provider";
+import { usePlaybackIndex } from "@/components/player/use-playback-index";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { TranscriptLine } from "@/lib/types";
 
-function smoothScroll(): ScrollBehavior {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ? "auto"
-    : "smooth";
+const SCROLL_MS = 280;
+
+function scrollParent(el: HTMLElement): HTMLElement | null {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      (overflowY === "auto" || overflowY === "scroll") &&
+      node.scrollHeight > node.clientHeight
+    ) {
+      return node;
+    }
+  }
+  return null;
+}
+
+/** Centre `el` in its scroll container with a short ease-out (snappier than native smooth). */
+function centerLine(el: HTMLElement) {
+  const box = scrollParent(el);
+  if (!box) return;
+  const boxRect = box.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  const target =
+    box.scrollTop +
+    (elRect.top - boxRect.top) -
+    (box.clientHeight / 2 - elRect.height / 2);
+  const from = box.scrollTop;
+  const delta =
+    Math.max(0, Math.min(target, box.scrollHeight - box.clientHeight)) - from;
+  if (Math.abs(delta) < 2) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    box.scrollTop = from + delta;
+    return;
+  }
+  const t0 = performance.now();
+  const step = (now: number) => {
+    const p = Math.min((now - t0) / SCROLL_MS, 1);
+    box.scrollTop = from + delta * (1 - Math.pow(1 - p, 3));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 function clock(s: number) {
@@ -38,21 +75,7 @@ export function Transcript({
 }) {
   const player = usePlayer();
   const isCurrent = player.track?.id === track.id;
-  const time = isCurrent ? player.time : -1;
-  const active = useMemo(() => {
-    if (time < 0) return -1;
-    let lo = 0;
-    let hi = lines.length - 1;
-    let found = -1;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      if (lines[mid].start <= time) {
-        found = mid;
-        lo = mid + 1;
-      } else hi = mid - 1;
-    }
-    return found;
-  }, [lines, time]);
+  const active = usePlaybackIndex(lines, track.id);
 
   const container = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -65,8 +88,8 @@ export function Transcript({
     const el = lineRefs.current[active];
     if (!el) return;
     programmatic.current = true;
-    el.scrollIntoView({ block: "center", behavior: smoothScroll() });
-    const t = setTimeout(() => (programmatic.current = false), 700);
+    centerLine(el);
+    const t = setTimeout(() => (programmatic.current = false), SCROLL_MS + 80);
     return () => clearTimeout(t);
   }, [active, following, isCurrent, player.playing]);
 
@@ -149,7 +172,8 @@ export function Transcript({
                           setFollowing(true);
                           player.play(track, line.start);
                         }}
-                        aria-current={state === "now" ? "true" : undefined}
+                        data-start={line.start}
+                      aria-current={state === "now" ? "true" : undefined}
                         aria-label={`Play from ${clock(line.start)}: ${line.text}`}
                         className={cn(
                           // Colour only: changing weight would re-wrap lines as the highlight moves.
@@ -183,10 +207,8 @@ export function Transcript({
               className="pointer-events-auto shadow-mac-popover"
               onClick={() => {
                 setFollowing(true);
-                lineRefs.current[active]?.scrollIntoView({
-                  block: "center",
-                  behavior: "smooth",
-                });
+                const el = lineRefs.current[active];
+                if (el) centerLine(el);
               }}
             >
               <ArrowDownIcon data-icon="inline-start" />

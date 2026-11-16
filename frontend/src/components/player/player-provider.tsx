@@ -35,6 +35,8 @@ interface PlayerState {
   skip: (delta: number) => void;
   setRate: (rate: number) => void;
   setVolume: (volume: number) => void;
+  /** Exact playback position, read straight from the audio element (for frame-level sync). */
+  getTime: () => number;
 }
 
 const PlayerContext = createContext<PlayerState | null>(null);
@@ -100,6 +102,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (audio.current) audio.current.playbackRate = value;
     setRateState(value);
   }, []);
+
+  const getTime = useCallback(() => audio.current?.currentTime ?? 0, []);
 
   const setVolume = useCallback((value: number) => {
     if (audio.current) audio.current.volume = value;
@@ -174,6 +178,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       skip,
       setRate,
       setVolume,
+      getTime,
     }),
     [
       track,
@@ -188,6 +193,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       skip,
       setRate,
       setVolume,
+      getTime,
     ],
   );
 
