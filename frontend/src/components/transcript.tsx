@@ -176,9 +176,10 @@ export function Transcript({
                       aria-current={state === "now" ? "true" : undefined}
                         aria-label={`Play from ${clock(line.start)}: ${line.text}`}
                         className={cn(
-                          // Colour only: changing weight would re-wrap lines as the highlight moves.
+                          // Real bold is wider and would re-wrap lines as the highlight moves, so the current
+                        // line is emboldened with a text stroke instead (.transcript-now in globals.css).
                           "inline scroll-my-24 rounded-[5px] px-[3px] text-left [box-decoration-break:clone] transition-[color,background-color] duration-300 hover:bg-mac-fill-tertiary focus-visible:outline-2 focus-visible:outline-mac-accent",
-                          state === "now" && "bg-mac-accent/12 text-mac-label",
+                          state === "now" && "transcript-now bg-mac-accent/12 text-mac-label",
                           state === "past" && "text-mac-label-secondary",
                           state === "next" && "text-mac-label",
                         )}

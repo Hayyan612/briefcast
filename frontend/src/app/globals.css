@@ -101,3 +101,19 @@
     animation-duration: 1ms !important;
   }
 }
+
+/*
+ * The line being read looks bold without being bold: a hairline stroke thickens the
+ * glyphs but keeps their advance widths, so the paragraph never re-wraps (real
+ * font-weight changes would make the text jump each time the highlight moves).
+ */
+.transcript-now {
+  -webkit-text-stroke: 0.55px currentColor;
+  paint-order: stroke fill;
+}
+@media (forced-colors: active) {
+  .transcript-now {
+    -webkit-text-stroke: 0;
+    font-weight: 600;
+  }
+}
