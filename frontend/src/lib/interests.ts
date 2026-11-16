@@ -254,3 +254,51 @@ export function coverForPicks(picks: readonly string[]): {
     color: first.color,
   };
 }
+
+/** True when `topic` is still the brief composed from `interests` (not hand-edited). */
+export function isComposedTopic(
+  topic: string,
+  interests: readonly string[],
+): boolean {
+  return interests.length > 0 && topic === composeTopic(interests);
+}
+
+/**
+ * The topic after adding one interest to a briefing: recomposed when the brief was
+ * composed from its interests, otherwise the user's own wording gains a short addition.
+ */
+export function topicAfterAdding(
+  briefing: { topic: string; interests: readonly string[] },
+  interest: string,
+): string {
+  const topic = briefing.topic.trim();
+  if (!topic || isComposedTopic(topic, briefing.interests)) {
+    return composeTopic([...briefing.interests, interest]);
+  }
+  return `${topic.replace(/[.!?]?$/, ".")} Also cover ${interest}.`;
+}
+
+/**
+ * Interests from the categories someone already follows that they do not follow yet,
+ * taken in turns across those categories so no single one fills every slot.
+ */
+export function suggestionsFor(
+  followed: readonly string[],
+  limit = 6,
+): string[] {
+  const have = new Set(followed.map((f) => f.toLowerCase()));
+  const pools = INTEREST_CATEGORIES.filter((c) =>
+    c.interests.some((i) => have.has(i.toLowerCase())),
+  ).map((c) => c.interests.filter((i) => !have.has(i.toLowerCase())));
+  const out: string[] = [];
+  for (
+    let round = 0;
+    out.length < limit && pools.some((p) => round < p.length);
+    round++
+  ) {
+    for (const pool of pools) {
+      if (round < pool.length && out.length < limit) out.push(pool[round]);
+    }
+  }
+  return out;
+}

@@ -56,6 +56,27 @@ class LinkOut(BaseModel):
     created_at: datetime
 
 
+MAX_INTERESTS = 6
+
+
+def normalize_interests(values: list[str] | None) -> list[str] | None:
+    """Trim, drop blanks and case-insensitive duplicates; at most MAX_INTERESTS."""
+    if values is None:
+        return None
+    out: list[str] = []
+    for raw in values:
+        text = " ".join(str(raw).split())
+        if not text:
+            continue
+        if len(text) > 80:
+            raise ValueError("Each interest must be 80 characters or fewer")
+        if text.lower() not in {o.lower() for o in out}:
+            out.append(text)
+    if len(out) > MAX_INTERESTS:
+        raise ValueError(f"Pick up to {MAX_INTERESTS} interests")
+    return out
+
+
 class BriefingIn(BaseModel):
     topic: str = Field(min_length=5, max_length=500)
     delivery_time: time
@@ -69,10 +90,12 @@ class BriefingIn(BaseModel):
     lookback: str = "day"
     finance_mode: bool = False
     watch_urls: list[str] = Field(default_factory=list)
+    interests: list[str] = Field(default_factory=list)
     icon: str | None = None
     color: str | None = None
 
     _cover = field_validator("icon", "color")(lambda cls, v, info: check_cover(info.field_name, v))
+    _interests = field_validator("interests")(lambda cls, v: normalize_interests(v))
     _domains = field_validator("trusted_domains", "blocked_domains")(
         lambda cls, v: normalize_domains(v)
     )
@@ -129,10 +152,12 @@ class BriefingPatch(BaseModel):
     lookback: str | None = None
     finance_mode: bool | None = None
     watch_urls: list[str] | None = None
+    interests: list[str] | None = None
     icon: str | None = None
     color: str | None = None
 
     _cover = field_validator("icon", "color")(lambda cls, v, info: check_cover(info.field_name, v))
+    _interests = field_validator("interests")(lambda cls, v: normalize_interests(v))
     _domains = field_validator("trusted_domains", "blocked_domains")(
         lambda cls, v: None if v is None else normalize_domains(v)
     )
@@ -220,6 +245,7 @@ class BriefingOut(BaseModel):
     lookback: str
     finance_mode: bool
     watch_urls: list[str]
+    interests: list[str] = []
     icon: str | None
     color: str | None
     pending_links: int = 0

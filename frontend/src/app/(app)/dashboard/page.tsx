@@ -13,6 +13,7 @@ import { BriefingDialog } from "@/components/briefing-dialog";
 import { EpisodeHero } from "@/components/episode-hero";
 import { EpisodesTable } from "@/components/episodes-table";
 import { LiveTranscriptCard } from "@/components/live-transcript-card";
+import { MoreLikeThis } from "@/components/more-like-this";
 import { Onboarding } from "@/components/onboarding";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -155,6 +156,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
               ))}
             </ul>
           </Card>
+          <MoreLikeThis briefings={briefings} voices={voices} />
         </aside>
       </div>
     </div>

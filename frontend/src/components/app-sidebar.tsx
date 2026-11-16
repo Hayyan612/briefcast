@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { BriefingDialog } from "@/components/briefing-dialog";
 import { CoverArt } from "@/components/cover-art";
-import { HomeIcon, PlusIcon } from "@/components/icons";
+import { HomeIcon, PlusIcon, CompassIcon } from "@/components/icons";
 import { FeedDialog } from "@/components/feed-dialog";
 import { NavLink } from "@/components/nav-link";
 import {
@@ -47,6 +47,12 @@ export function SidebarNav({
               <NavLink href="/dashboard">
                 <HomeIcon />
                 Home
+              </NavLink>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <NavLink href="/discover">
+                <CompassIcon />
+                Discover
               </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>

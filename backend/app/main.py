@@ -160,6 +160,7 @@ async def create_briefing(
         lookback=body.lookback,
         finance_mode=body.finance_mode,
         watch_urls=body.watch_urls,
+        interests=body.interests,
         icon=body.icon,
         color=body.color,
         next_run_at=next_run_after(body.delivery_time, body.timezone, now_utc()),

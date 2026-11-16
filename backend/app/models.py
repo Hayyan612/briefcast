@@ -66,6 +66,9 @@ class Briefing(Base):
     finance_mode: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     # Websites to follow: new pages on them become sources.
     watch_urls: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    # The interests picked in the app (up to 6); `topic` is the brief composed from them,
+    # or the user's own wording.
+    interests: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
     # Cover art (None = chosen automatically from the topic).
     icon: Mapped[str | None] = mapped_column(String(24))
     color: Mapped[str | None] = mapped_column(String(16))

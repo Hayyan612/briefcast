@@ -59,4 +59,5 @@ export {
   MonitorIcon,
   MoonIcon,
   SunIcon,
+  CompassIcon,
 } from "@solar-icons/react/linear";

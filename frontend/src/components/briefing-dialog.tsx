@@ -30,7 +30,15 @@ import {
 } from "@/components/source-fields";
 import { CoverPicker } from "@/components/cover-picker";
 import { Switch } from "@/components/ui/switch";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Textarea } from "@/components/ui/textarea";
+import { ChevronRightIcon } from "@/components/icons";
+import { InterestPicker } from "@/components/interest-picker";
+import { composeTopic, isComposedTopic } from "@/lib/interests";
 import { TimeSelect, TimezonePicker } from "@/components/schedule-fields";
 import { VoiceFields } from "@/components/voice-fields";
 import { useBrowserTimezone } from "@/hooks/use-browser-timezone";
@@ -47,6 +55,8 @@ const EXAMPLES = [
 interface Props {
   voices: Voice[];
   briefing?: Briefing;
+  /** Interests to start a new briefing with (e.g. picked on the Discover page). */
+  initialInterests?: string[];
   /** Element that opens the dialog. Omit when controlling `open` from outside. */
   trigger?: ReactElement;
   open?: boolean;
@@ -57,6 +67,7 @@ export function BriefingDialog({
   voices,
   briefing,
   trigger,
+  initialInterests,
   ...controlled
 }: Props) {
   const router = useRouter();
@@ -64,7 +75,18 @@ export function BriefingDialog({
   const open = controlled.open ?? localOpen;
   const setOpen = controlled.onOpenChange ?? setLocalOpen;
   const [saving, setSaving] = useState(false);
-  const [topic, setTopic] = useState(briefing?.topic ?? "");
+  const [picks, setPicks] = useState<string[]>(
+    () => briefing?.interests ?? initialInterests ?? [],
+  );
+  // A briefing whose topic is not the brief composed from its interests (hand-written, or
+  // created before interests existed) keeps that wording until the picks change.
+  const [topicEdit, setTopicEdit] = useState<string | null>(() =>
+    briefing && !isComposedTopic(briefing.topic, briefing.interests)
+      ? briefing.topic
+      : null,
+  );
+  const topic = topicEdit ?? composeTopic(picks);
+  const topicOk = topic.trim().length >= 5;
   const [time, setTime] = useState(
     briefing?.delivery_time.slice(0, 5) ?? "08:00",
   );
@@ -95,6 +117,7 @@ export function BriefingDialog({
     try {
       const body = JSON.stringify({
         topic,
+        interests: picks,
         delivery_time: time,
         timezone,
         voice,
@@ -115,9 +138,11 @@ export function BriefingDialog({
       } else {
         await api("/briefings", { method: "POST", body });
         toast.success("Briefing scheduled", {
-          description: "Choose “Make an episode now” from its menu to hear one right away.",
+          description:
+            "Choose “Make an episode now” from its menu to hear one right away.",
         });
-        setTopic("");
+        setPicks([]);
+        setTopicEdit(null);
       }
       setOpen(false);
       router.refresh();
@@ -131,34 +156,61 @@ export function BriefingDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger ? <DialogTrigger render={trigger} /> : null}
-      <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-2xl">
         <form onSubmit={save} className="grid gap-5">
           <DialogHeader>
             <DialogTitle className="text-mac-title-2">
               {briefing ? "Edit briefing" : "New daily briefing"}
             </DialogTitle>
             <DialogDescription>
-              The agent researches this topic from fresh sources every day and
-              sends you a five-minute episode.
+              Pick up to six interests, or write your own brief. The agent
+              researches it from fresh sources and sends you a five-minute
+              episode every day.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="topic">Topic</FieldLabel>
-              <Textarea
-                id="topic"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder={EXAMPLES[0]}
-                minLength={5}
-                maxLength={500}
-                required
-                rows={3}
+              <FieldLabel>Interests</FieldLabel>
+              <InterestPicker
+                picks={picks}
+                onChange={(next) => {
+                  setPicks(next);
+                  setTopicEdit(null);
+                }}
               />
-              <FieldDescription>
-                Be specific. For example: “{EXAMPLES[1]}” or “{EXAMPLES[2]}”.
-              </FieldDescription>
             </Field>
+            <Collapsible
+              defaultOpen={topicEdit !== null || picks.length === 0}
+              className="rounded-mac-group border border-mac-separator"
+            >
+              <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2.5 text-left">
+                <ChevronRightIcon className="size-4 text-mac-label-secondary transition-transform duration-200 group-data-[panel-open]:rotate-90" />
+                <span className="font-medium">
+                  {picks.length
+                    ? "Fine-tune the brief"
+                    : "Or describe it in your own words"}
+                </span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="px-3 pb-3">
+                <Field>
+                  <FieldLabel htmlFor="topic" className="sr-only">
+                    Brief
+                  </FieldLabel>
+                  <Textarea
+                    id="topic"
+                    value={topic}
+                    onChange={(e) => setTopicEdit(e.target.value)}
+                    placeholder={EXAMPLES[0]}
+                    maxLength={500}
+                    rows={3}
+                  />
+                  <FieldDescription>
+                    What the research agent is asked to cover. Be specific, for
+                    example “{EXAMPLES[1]}”.
+                  </FieldDescription>
+                </Field>
+              </CollapsibleContent>
+            </Collapsible>
             <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
               <Field>
                 <FieldLabel htmlFor="time">Daily at</FieldLabel>
@@ -214,7 +266,7 @@ export function BriefingDialog({
             <DialogClose render={<Button variant="outline" type="button" />}>
               Cancel
             </DialogClose>
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving || !topicOk}>
               {saving ? <Spinner data-icon="inline-start" /> : null}
               {briefing ? "Save changes" : "Schedule briefing"}
             </Button>

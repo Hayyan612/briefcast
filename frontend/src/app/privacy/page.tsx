@@ -37,9 +37,7 @@ export default function PrivacyPage() {
       <Brand />
       <Card>
         <CardHeader>
-          <CardTitle className="text-mac-large-title">
-            Privacy policy
-          </CardTitle>
+          <CardTitle className="text-mac-large-title">Privacy policy</CardTitle>
           <CardDescription>
             Briefcast is a demo project. Last updated 16 November 2026.
           </CardDescription>

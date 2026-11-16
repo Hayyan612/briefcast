@@ -67,6 +67,7 @@ export interface Briefing {
   lookback: "day" | "week";
   finance_mode: boolean;
   watch_urls: string[];
+  interests: string[];
   icon: string | null;
   color: string | null;
   pending_links: number;

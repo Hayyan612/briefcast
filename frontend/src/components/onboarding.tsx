@@ -134,6 +134,7 @@ export function Onboarding({
         method: "POST",
         body: JSON.stringify({
           topic,
+          interests: picks,
           ...coverForPicks(picks),
           delivery_time: time,
           timezone,

@@ -75,7 +75,9 @@ function PlayerBarInner() {
             className="size-12"
           />
           <div className="min-w-0">
-            <p className="truncate text-mac-body font-semibold">{p.track.title}</p>
+            <p className="truncate text-mac-body font-semibold">
+              {p.track.title}
+            </p>
             <LiveCaption fallback={p.track.topic} />
           </div>
         </button>

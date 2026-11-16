@@ -159,6 +159,9 @@ with a source-list sidebar, toolbar search, system colors and icon tiles.
   and Inter as the fallback for San Francisco on Windows, Android and Linux.
 - **Onboarding** in five steps: interests (browse, search or type your own), sources, schedule
   with voice samples, review, then the first episode is made straight away.
+- **Discover:** browse or search every interest after onboarding, and start a briefing with one
+  or add it to an existing mix. The dashboard suggests interests next to the ones you follow,
+  and New and Edit briefing use the same picker, with "Fine-tune the brief" for your own wording.
 - **Player:** one `<audio>` element in a React context, so playback continues across pages,
   with a live caption, a Now Playing sheet with the lyrics-style transcript, ±15 s, speed,
   the Media Session API (lock screen and media keys) and resume where you left off.
