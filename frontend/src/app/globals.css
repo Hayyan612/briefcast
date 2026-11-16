@@ -33,3 +33,47 @@
     transform: translateY(6px);
   }
 }
+
+/* Touch screens: every control gets a 44 px hit area (Apple HIG, WCAG 2.5.5). */
+@media (pointer: coarse) {
+  :is(button, [role="button"], [role="switch"], [role="tab"], a[data-slot="button"]):not([inert] *) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Click and hover feel: quick, physical, and off for reduced-motion users. */
+@media (prefers-reduced-motion: no-preference) {
+  :is(
+      [data-slot="button"],
+      [data-slot="toggle"],
+      [data-slot="sidebar-menu-button"],
+      [data-slot="sidebar-group-action"],
+      [data-slot="dropdown-menu-item"],
+      [data-slot="tabs-trigger"],
+      [data-slot="switch"],
+      tbody tr
+    ) {
+    transition:
+      transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      background-color 160ms ease,
+      color 160ms ease,
+      box-shadow 160ms ease,
+      opacity 160ms ease;
+  }
+  :is(
+      [data-slot="button"],
+      [data-slot="toggle"],
+      [data-slot="sidebar-menu-button"],
+      [data-slot="sidebar-group-action"]
+    ):active:not(:disabled):not([aria-disabled="true"]) {
+    transform: scale(0.96);
+    transition-duration: 60ms;
+  }
+  tbody tr:active {
+    transform: scale(0.995);
+  }
+  [data-slot="tabs-content"] {
+    animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}

@@ -4,8 +4,6 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import {
   GaugeIcon,
-  PauseIcon,
-  PlayIcon,
   Rewind15BackIcon,
   Rewind15ForwardIcon,
   Volume2Icon,
@@ -13,6 +11,7 @@ import {
 } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
+import { PlayPauseGlyph } from "@/components/player/play-button";
 import { usePlayer } from "@/components/player/player-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,7 +80,7 @@ function PlayerBarInner() {
                 render={
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon-lg"
                     aria-label="Back 15 seconds"
                   />
                 }
@@ -97,14 +96,14 @@ function PlayerBarInner() {
               aria-label={p.playing ? "Pause" : "Play"}
               onClick={p.toggle}
             >
-              {p.playing ? <PauseIcon /> : <PlayIcon />}
+              <PlayPauseGlyph playing={p.playing} />
             </Button>
             <Tooltip>
               <TooltipTrigger
                 render={
                   <Button
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon-lg"
                     aria-label="Forward 15 seconds"
                   />
                 }
@@ -132,7 +131,7 @@ function PlayerBarInner() {
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <Button variant="ghost" size="sm" aria-label="Playback speed" />
+                <Button variant="ghost" aria-label="Playback speed" />
               }
             >
               <GaugeIcon data-icon="inline-start" />
@@ -156,7 +155,7 @@ function PlayerBarInner() {
           </DropdownMenu>
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="icon-lg"
             aria-label={p.volume ? "Mute" : "Unmute"}
             onClick={() => p.setVolume(p.volume ? 0 : 1)}
           >

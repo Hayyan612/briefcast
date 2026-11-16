@@ -25,7 +25,7 @@ export function EpisodeRowActions({ episode }: { episode: EpisodeSummary }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="ghost" size="icon-sm" aria-label="Episode options" />
+          <Button variant="ghost" size="icon" aria-label="Episode options" />
         }
       >
         <EllipsisVerticalIcon />

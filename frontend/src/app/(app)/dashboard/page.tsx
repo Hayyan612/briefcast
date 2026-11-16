@@ -65,7 +65,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-10">
       <AutoRefresh active={generating} />
       {selected || q ? (
         <div className="flex flex-wrap items-center gap-2">
@@ -75,7 +75,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
           {q ? (
             <Badge variant="secondary">Search: “{one(params.q)}”</Badge>
           ) : null}
-          <LinkButton href="/dashboard" variant="ghost" size="sm">
+          <LinkButton href="/dashboard" variant="ghost">
             <XIcon data-icon="inline-start" />
             Clear
           </LinkButton>
@@ -84,10 +84,10 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
 
       {latest ? <EpisodeHero episode={latest} /> : null}
 
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <section className="grid gap-3">
+      <div className="grid items-start gap-10 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-8">
+        <section className="grid gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold tracking-tight">Episodes</h2>
+            <h2 className="text-mac-title-2 font-bold">Episodes</h2>
             <span className="text-sm text-muted-foreground">
               {episodes.length} total
             </span>
@@ -117,13 +117,13 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
           </Card>
         </section>
 
-        <aside className="grid min-w-0 gap-3">
+        <aside className="grid min-w-0 gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold tracking-tight">Coming up</h2>
+            <h2 className="text-mac-title-2 font-bold">Coming up</h2>
             <BriefingDialog
               voices={voices}
               trigger={
-                <Button size="sm" variant="ghost">
+                <Button variant="ghost">
                   <PlusIcon data-icon="inline-start" />
                   New
                 </Button>

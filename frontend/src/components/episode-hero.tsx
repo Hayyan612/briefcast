@@ -25,12 +25,12 @@ export function EpisodeHero({
   const title = episode.title ?? episode.topic;
   return (
     <Card className="rise py-0">
-      <CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center">
+      <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center md:gap-8 md:p-8">
         <CoverArt
           topic={episode.topic}
           className="size-20 rounded-[18px] md:size-24 md:rounded-[22px]"
         />
-        <div className="grid min-w-0 gap-3">
+        <div className="grid min-w-0 gap-2.5">
           <span className="text-mac-subheadline font-semibold text-mac-label-secondary">
             {eyebrow}
           </span>
@@ -53,7 +53,7 @@ export function EpisodeHero({
               <LocalTime iso={episode.scheduled_for} />
             </Badge>
           </div>
-          <div className="mt-1 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2.5">
             <PlayButton
               size="lg"
               label="Play episode"

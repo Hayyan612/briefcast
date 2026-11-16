@@ -38,13 +38,13 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
           return (
             <TableRow
               key={ep.id}
-              className="group rise transition-colors"
+              className="group rise h-14 transition-colors"
               style={{ "--i": Math.min(i, 12) } as React.CSSProperties}
             >
               <TableCell>
                 {ep.status === "ready" ? (
                   <PlayButton
-                    size="icon-sm"
+                    size="icon-lg"
                     className="rounded-full"
                     track={{ id: ep.id, title, topic: ep.topic }}
                   />
@@ -57,10 +57,10 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
               <TableCell className="max-w-0 w-full">
                 <Link
                   href={`/episodes/${ep.id}`}
-                  className="flex min-w-0 items-center gap-3"
+                  className="flex min-w-0 items-center gap-3.5 py-2"
                 >
-                  <CoverArt topic={ep.topic} />
-                  <span className="grid min-w-0">
+                  <CoverArt topic={ep.topic} className="size-9 rounded-[9px]" />
+                  <span className="grid min-w-0 gap-0.5">
                     <span className="truncate font-semibold group-hover:text-primary">
                       {title}
                     </span>

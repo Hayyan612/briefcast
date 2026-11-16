@@ -44,11 +44,17 @@ function Shell({
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 bg-[#e5e5ea] md:p-3">
+    <div className="fixed inset-0 bg-[#e5e5ea] md:p-4">
+      <a
+        href="#content"
+        className="sr-only z-50 rounded-md bg-mac-accent px-3 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >
+        Skip to content
+      </a>
       <SidebarProvider className="contents">
         <Window className="size-full max-md:rounded-none max-md:shadow-none">
           {sidebar}
-          <WindowTitlebar className="gap-2 pr-3">
+          <WindowTitlebar className="gap-3 pr-4">
             {mobileNav}
             <WindowTitle className="max-sm:hidden">Briefcast</WindowTitle>
             <div className="ml-auto flex min-w-0 flex-1 items-center justify-end gap-2">
@@ -62,8 +68,13 @@ function Shell({
               {account}
             </div>
           </WindowTitlebar>
-          <WindowContent className="overflow-y-auto px-4 py-5 md:px-6">
-            {children}
+          <WindowContent
+            id="content"
+            role="main"
+            tabIndex={-1}
+            className="overflow-y-auto px-5 py-6 outline-none md:px-10 md:py-8"
+          >
+            <div className="mx-auto w-full max-w-6xl">{children}</div>
           </WindowContent>
           <PlayerBar />
         </Window>

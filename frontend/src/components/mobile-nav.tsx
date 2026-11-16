@@ -36,9 +36,11 @@ export function MobileNav({ children }: { children: ReactNode }) {
       >
         <SidebarIcon />
       </SheetTrigger>
-      <SheetContent side="left" className="w-72 p-0">
-        <SheetTitle className="sr-only">Navigation</SheetTitle>
-        {children}
+      <SheetContent side="left" className="flex w-72 flex-col gap-2 p-0">
+        <div className="flex h-14 shrink-0 items-center border-b px-5 pr-14">
+          <SheetTitle className="text-mac-headline font-semibold">Briefcast</SheetTitle>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">{children}</div>
       </SheetContent>
     </Sheet>
   );

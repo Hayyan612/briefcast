@@ -93,10 +93,10 @@ export function BriefingCard({
   return (
     <Card className="min-w-0 overflow-hidden">
       <CardHeader>
-        <CardTitle className="font-heading text-lg leading-snug">
+        <CardTitle className="text-mac-headline leading-snug font-semibold">
           {briefing.topic}
         </CardTitle>
-        <CardDescription className="flex flex-wrap items-center gap-2">
+        <CardDescription className="mt-2 flex flex-wrap items-center gap-1.5">
           <Badge variant="secondary">
             <CalendarClockIcon data-icon="inline-start" />
             Daily at {formatTime(briefing.delivery_time)}
@@ -117,7 +117,7 @@ export function BriefingCard({
               render={
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon"
                   aria-label="Briefing options"
                 />
               }
@@ -141,7 +141,7 @@ export function BriefingCard({
           </DropdownMenu>
         </CardAction>
       </CardHeader>
-      <CardContent className="min-w-0 text-sm text-muted-foreground">
+      <CardContent className="grid min-w-0 gap-3 text-mac-callout text-muted-foreground">
         {briefing.is_active ? (
           <>
             Next episode <LocalTime iso={briefing.next_run_at} />
@@ -150,15 +150,15 @@ export function BriefingCard({
           "Paused. No episodes will be generated."
         )}
         {latest ? (
-          <div className="mt-3 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <span>Latest episode</span>
             <StatusBadge status={latest.status} />
             <Link
               href={`/episodes/${latest.id}`}
               className={buttonVariants({
                 variant: "link",
-                size: "sm",
-                className: "ml-auto px-0",
+                size: "default",
+                className: "ml-auto h-7 px-2",
               })}
             >
               Open
@@ -166,7 +166,7 @@ export function BriefingCard({
           </div>
         ) : null}
       </CardContent>
-      <CardFooter className="justify-between gap-3">
+      <CardFooter className="justify-between gap-3 py-3">
         <div className="flex items-center gap-2">
           <Switch
             id={`active-${briefing.id}`}
@@ -190,7 +190,7 @@ export function BriefingCard({
           <TooltipTrigger
             render={
               <Button
-                size="sm"
+                size="lg"
                 disabled={busy === "run" || generating}
                 onClick={() =>
                   act(

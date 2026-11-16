@@ -161,7 +161,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
 
         <TabsContent value="script">
           <Card>
-            <CardContent className="grid gap-4 leading-relaxed">
+            <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-2 text-[15px] leading-7 text-mac-label">
               {ep.script ? (
                 ep.script.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)
               ) : (
@@ -250,7 +250,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
 export default function EpisodePage({ params }: PageProps<"/episodes/[id]">) {
   return (
     <>
-      <div className="mx-auto grid w-full max-w-4xl gap-6">
+      <div className="mx-auto grid w-full max-w-4xl gap-8">
         <LinkButton
           href="/dashboard"
           variant="ghost"

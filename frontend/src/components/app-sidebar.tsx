@@ -1,9 +1,9 @@
-import Link from "next/link";
 
 import { auth } from "@/auth";
 import { BriefingDialog } from "@/components/briefing-dialog";
 import { CoverArt } from "@/components/cover-art";
 import { HomeIcon, PlusIcon } from "@/components/icons";
+import { NavLink } from "@/components/nav-link";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,6 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,13 +40,14 @@ export function SidebarNav({
 }) {
   return (
     <SidebarContent>
+      <nav aria-label="Main" className="contents">
       <SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton render={<Link href="/dashboard" />}>
+            <NavLink href="/dashboard">
               <HomeIcon />
               Home
-            </SidebarMenuButton>
+            </NavLink>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
@@ -56,7 +56,7 @@ export function SidebarNav({
         <BriefingDialog
           voices={voices}
           trigger={
-            <SidebarGroupAction aria-label="New briefing">
+            <SidebarGroupAction aria-label="New briefing" className="size-6">
               <PlusIcon />
             </SidebarGroupAction>
           }
@@ -65,10 +65,7 @@ export function SidebarNav({
           <SidebarMenu>
             {briefings.map((b) => (
               <SidebarMenuItem key={b.id}>
-                <SidebarMenuButton
-                  size="lg"
-                  render={<Link href={`/dashboard?briefing=${b.id}`} />}
-                >
+                <NavLink href={`/dashboard?briefing=${b.id}`} briefingId={b.id} size="lg">
                   <CoverArt topic={b.topic} className="size-8" />
                   <span className="grid min-w-0 leading-tight">
                     <span className="truncate">{b.topic}</span>
@@ -78,12 +75,13 @@ export function SidebarNav({
                         : "Paused"}
                     </span>
                   </span>
-                </SidebarMenuButton>
+                </NavLink>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
+      </nav>
     </SidebarContent>
   );
 }
@@ -99,7 +97,8 @@ export function DesktopSidebar(props: {
       data-slot="mac-sidebar"
       className="hidden w-60 bg-transparent md:flex"
     >
-      <div data-window-drag-region className="flex h-12 shrink-0 items-center px-4">
+      {/* Decorative: the window cannot be closed or minimised in a browser. */}
+      <div data-window-drag-region inert className="flex h-13 shrink-0 items-center px-5">
         <WindowControls />
       </div>
       <SidebarNav {...props} />
@@ -114,6 +113,9 @@ export function SidebarSkeleton() {
       data-slot="mac-sidebar"
       className="hidden w-60 bg-transparent pt-12 md:flex"
     >
+      <div inert className="flex h-13 shrink-0 items-center px-5">
+        <WindowControls />
+      </div>
       <div className="grid gap-2 p-3">
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className="flex h-10 items-center gap-2">

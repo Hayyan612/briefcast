@@ -14,7 +14,7 @@ export function RetryButton({ episodeId }: { episodeId: string }) {
   const [busy, setBusy] = useState(false);
   return (
     <Button
-      size="sm"
+      size="lg"
       variant="outline"
       disabled={busy}
       onClick={async () => {

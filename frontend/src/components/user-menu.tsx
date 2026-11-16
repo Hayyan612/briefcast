@@ -41,7 +41,7 @@ export function UserMenu({
     .slice(0, 2)
     .toUpperCase();
   const avatar = (
-    <Avatar className="size-8">
+    <Avatar className={variant === "sidebar" ? "size-8" : "size-7"}>
       {image ? <AvatarImage src={image} alt="" /> : null}
       <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
@@ -87,7 +87,14 @@ export function UserMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={<Button variant="ghost" size="icon" className="rounded-full" />}
+        render={
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="rounded-full"
+            aria-label="Account menu"
+          />
+        }
       >
         {avatar}
       </DropdownMenuTrigger>
