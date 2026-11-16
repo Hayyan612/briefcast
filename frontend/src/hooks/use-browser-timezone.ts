@@ -20,6 +20,9 @@ export function useBrowserTimezone(): string | null {
 
 /** All IANA zones the browser knows, with `current` guaranteed to be present. */
 export function timezoneOptions(current: string): string[] {
-  const all = typeof Intl.supportedValuesOf === "function" ? Intl.supportedValuesOf("timeZone") : [];
+  const all =
+    typeof Intl.supportedValuesOf === "function"
+      ? Intl.supportedValuesOf("timeZone")
+      : [];
   return all.includes(current) ? all : [current, ...all];
 }

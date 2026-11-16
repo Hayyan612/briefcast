@@ -41,7 +41,7 @@ export function UserMenu({
     .slice(0, 2)
     .toUpperCase();
   const avatar = (
-    <Avatar className={variant === "sidebar" ? "size-8" : "size-7"}>
+    <Avatar className="size-8">
       {image ? <AvatarImage src={image} alt="" /> : null}
       <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
@@ -91,7 +91,7 @@ export function UserMenu({
           <Button
             variant="ghost"
             size="icon-lg"
-            className="rounded-full"
+            className="size-8 shrink-0 rounded-full p-0"
             aria-label="Account menu"
           />
         }

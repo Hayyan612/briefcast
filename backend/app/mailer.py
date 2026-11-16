@@ -20,7 +20,7 @@ async def send_mail(
     msg["Message-ID"] = make_msgid(domain="briefcast")
     if unsubscribe_url:
         # RFC 8058 one-click unsubscribe: mail clients show their own Unsubscribe button.
-        msg["List-Unsubscribe"] = f"<{unsubscribe_url}>"
+        msg["List-Unsubscribe"] = f"<{unsubscribe_url}/one-click>"
         msg["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
     msg.set_content(text)
     msg.add_alternative(html, subtype="html")

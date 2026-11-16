@@ -46,6 +46,8 @@ export interface Briefing {
   delivery_time: string;
   timezone: string;
   voice: string;
+  language: string;
+  email_enabled: boolean;
   is_active: boolean;
   next_run_at: string;
   created_at: string;
@@ -55,7 +57,7 @@ export interface Briefing {
 export interface Voice {
   id: string;
   label: string;
-  language: string;
+  languages: string[];
 }
 
 export const IN_PROGRESS: EpisodeStatus[] = [

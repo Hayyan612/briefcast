@@ -21,12 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Item,
@@ -47,12 +42,14 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { VoiceFields } from "@/components/voice-fields";
 import {
   timezoneOptions,
   useBrowserTimezone,
 } from "@/hooks/use-browser-timezone";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
+import { languageLabel } from "@/lib/languages";
 import type { Briefing, EpisodeSummary, Voice } from "@/lib/types";
 
 const SUGGESTIONS = [
@@ -100,6 +97,7 @@ export function Onboarding({
   const [chosenTz, setTimezone] = useState<string | null>(null);
   const timezone = chosenTz ?? detectedTz ?? "Asia/Kolkata";
   const [voice, setVoice] = useState(voices[0]?.id ?? "");
+  const [language, setLanguage] = useState("en-IN");
   const [busy, setBusy] = useState(false);
 
   const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
@@ -119,7 +117,13 @@ export function Onboarding({
     try {
       const briefing = await api<Briefing>("/briefings", {
         method: "POST",
-        body: JSON.stringify({ topic, delivery_time: time, timezone, voice }),
+        body: JSON.stringify({
+          topic,
+          delivery_time: time,
+          timezone,
+          voice,
+          language,
+        }),
       });
       const episode = await api<EpisodeSummary>(
         `/briefings/${briefing.id}/run`,
@@ -259,7 +263,7 @@ export function Onboarding({
               <>
                 <CardHeader>
                   <CardTitle className="text-2xl font-bold">
-                    When do you want it?
+                    When, and in which language?
                   </CardTitle>
                   <CardDescription className="text-base">
                     A new episode is ready at this time every day.
@@ -299,28 +303,15 @@ export function Onboarding({
                         </Select>
                       </Field>
                     </div>
-                    <Field>
-                      <FieldLabel>Voice</FieldLabel>
-                      <Select
-                        items={voiceItems}
-                        value={voice}
-                        onValueChange={(v) => v && setVoice(v)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent alignItemWithTrigger={false}>
-                          {voices.map((v) => (
-                            <SelectItem key={v.id} value={v.id}>
-                              {v.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FieldDescription>
-                        Gnani.ai Timbre voices. You can change this later.
-                      </FieldDescription>
-                    </Field>
+                    <VoiceFields
+                      voices={voices}
+                      language={language}
+                      voice={voice}
+                      onChange={(next) => {
+                        setLanguage(next.language);
+                        setVoice(next.voice);
+                      }}
+                    />
                   </FieldGroup>
                 </CardContent>
                 <CardFooter className="justify-between">
@@ -374,8 +365,11 @@ export function Onboarding({
                         <AudioLinesIcon />
                       </ItemMedia>
                       <ItemContent>
-                        <ItemDescription>Voice</ItemDescription>
-                        <ItemTitle>{voiceItems[voice]}</ItemTitle>
+                        <ItemDescription>Language and voice</ItemDescription>
+                        <ItemTitle>
+                          {languageLabel(language)} ·{" "}
+                          {voiceItems[voice]?.split(" · ")[0]}
+                        </ItemTitle>
                       </ItemContent>
                     </Item>
                   </ItemGroup>

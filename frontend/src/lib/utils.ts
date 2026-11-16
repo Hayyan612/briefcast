@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx"
-import { extendTailwindMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { extendTailwindMerge } from "tailwind-merge";
 
 // Teach tailwind-merge the macOS theme scales, so e.g. `text-mac-body`
 // (a font size) is not mistaken for a text color and dropped.
@@ -38,8 +38,8 @@ const twMerge = extendTailwindMerge({
       ],
     },
   },
-})
+});
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }

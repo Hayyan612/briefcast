@@ -14,7 +14,16 @@ import {
 import { IconTile } from "@/components/ui/icon-tile";
 import { cn } from "@/lib/utils";
 
-type TileColor = "blue" | "green" | "orange" | "purple" | "pink" | "teal" | "indigo" | "red" | "graphite";
+type TileColor =
+  | "blue"
+  | "green"
+  | "orange"
+  | "purple"
+  | "pink"
+  | "teal"
+  | "indigo"
+  | "red"
+  | "graphite";
 
 // Topic → glyph and macOS system color, like the tiles in System Settings.
 const TOPICS: [RegExp, typeof PodcastIcon, TileColor][] = [
@@ -28,7 +37,14 @@ const TOPICS: [RegExp, typeof PodcastIcon, TileColor][] = [
   [/\b(climate|energy|clean|solar|carbon)/i, LeafIcon, "green"],
   [/\b(world|global|geopolit)/i, GlobalIcon, "blue"],
 ];
-const FALLBACK: TileColor[] = ["blue", "purple", "pink", "orange", "teal", "indigo"];
+const FALLBACK: TileColor[] = [
+  "blue",
+  "purple",
+  "pink",
+  "orange",
+  "teal",
+  "indigo",
+];
 
 function pick(topic: string): [typeof PodcastIcon, TileColor] {
   const hit = TOPICS.find(([re]) => re.test(topic));
@@ -39,7 +55,13 @@ function pick(topic: string): [typeof PodcastIcon, TileColor] {
 }
 
 /** Briefing cover: a macOS icon tile in a system color with a subject glyph. */
-export function CoverArt({ topic, className }: { topic: string; className?: string }) {
+export function CoverArt({
+  topic,
+  className,
+}: {
+  topic: string;
+  className?: string;
+}) {
   const [Icon, color] = pick(topic);
   return (
     <IconTile

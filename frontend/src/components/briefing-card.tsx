@@ -7,6 +7,7 @@ import { notify as toast } from "@/lib/notify";
 import {
   CalendarClockIcon,
   EllipsisIcon,
+  LanguagesIcon,
   MicIcon,
   PencilIcon,
   PlayIcon,
@@ -54,6 +55,7 @@ import {
 } from "@/components/ui/tooltip";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
+import { languageLabel } from "@/lib/languages";
 import { IN_PROGRESS, type Briefing, type Voice } from "@/lib/types";
 
 export function BriefingCard({
@@ -104,6 +106,15 @@ export function BriefingCard({
           <Badge variant="outline">
             {briefing.timezone.replaceAll("_", " ")}
           </Badge>
+          {briefing.language !== "en-IN" ? (
+            <Badge variant="outline">
+              <LanguagesIcon data-icon="inline-start" />
+              {languageLabel(briefing.language)}
+            </Badge>
+          ) : null}
+          {!briefing.email_enabled ? (
+            <Badge variant="outline">Email off</Badge>
+          ) : null}
           {voiceLabel ? (
             <Badge variant="outline">
               <MicIcon data-icon="inline-start" />

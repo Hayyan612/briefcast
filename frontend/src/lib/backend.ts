@@ -46,3 +46,13 @@ export async function backendJson<T>(
   if (!res.ok) throw new Error(`Backend ${path} returned ${res.status}`);
   return res.json() as Promise<T>;
 }
+
+/** Calls the API's /public/* endpoints, which authorise by token instead of session. */
+export async function publicBackendFetch(
+  path: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  if (!path.startsWith("/public/"))
+    throw new Error("publicBackendFetch only reaches /public/*");
+  return fetch(`${BACKEND_URL}${path}`, { ...init, cache: "no-store" });
+}

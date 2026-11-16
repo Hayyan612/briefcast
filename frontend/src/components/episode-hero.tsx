@@ -1,8 +1,8 @@
-
 import { LinkButton } from "@/components/link-button";
 import { BookOpenIcon, ClockIcon, FileTextIcon } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
+import { DownloadButton } from "@/components/download-button";
 import { PlayButton } from "@/components/player/play-button";
 import { LocalTime } from "@/components/local-time";
 import { Badge } from "@/components/ui/badge";
@@ -34,10 +34,10 @@ export function EpisodeHero({
           <span className="text-mac-subheadline font-semibold text-mac-label-secondary">
             {eyebrow}
           </span>
-          <h1 className="text-mac-title-1 font-bold text-balance">
-            {title}
-          </h1>
-          <p className="line-clamp-2 text-mac-body text-mac-label-secondary">{episode.topic}</p>
+          <h1 className="text-mac-title-1 font-bold text-balance">{title}</h1>
+          <p className="line-clamp-2 text-mac-body text-mac-label-secondary">
+            {episode.topic}
+          </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline">
               <ClockIcon data-icon="inline-start" />
@@ -68,7 +68,9 @@ export function EpisodeHero({
                 <FileTextIcon data-icon="inline-start" />
                 Script and sources
               </LinkButton>
-            ) : null}
+            ) : (
+              <DownloadButton episodeId={episode.id} />
+            )}
           </div>
         </div>
       </CardContent>

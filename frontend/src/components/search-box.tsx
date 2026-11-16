@@ -24,16 +24,17 @@ export function SearchBox() {
   }, []);
 
   return (
-    <Form action="/dashboard" role="search" className="w-full max-w-xs">
+    <Form action="/dashboard" role="search" className="w-72 max-sm:w-full">
       <SearchField
         ref={ref}
         key={q}
         name="q"
         size="lg"
+        variant="filled"
         defaultValue={q}
-        placeholder="Search episodes  ⌘K"
+        placeholder="Search episodes"
         aria-label="Search episodes and topics"
-        className="w-full"
+        className="h-8 w-full"
       />
     </Form>
   );

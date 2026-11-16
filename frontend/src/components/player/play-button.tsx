@@ -3,7 +3,10 @@
 import { AnimatePresence, motion } from "motion/react";
 
 import { PauseIcon, PlayIcon } from "@/components/icons";
-import { usePlayer, type PlayerTrack } from "@/components/player/player-provider";
+import {
+  usePlayer,
+  type PlayerTrack,
+} from "@/components/player/player-provider";
 import { Button } from "@/components/ui/button";
 
 /** Morphing play/pause glyph shared by every play control. */

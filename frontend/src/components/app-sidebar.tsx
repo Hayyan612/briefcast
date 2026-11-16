@@ -1,8 +1,8 @@
-
 import { auth } from "@/auth";
 import { BriefingDialog } from "@/components/briefing-dialog";
 import { CoverArt } from "@/components/cover-art";
 import { HomeIcon, PlusIcon } from "@/components/icons";
+import { FeedDialog } from "@/components/feed-dialog";
 import { NavLink } from "@/components/nav-link";
 import {
   Sidebar,
@@ -41,46 +41,53 @@ export function SidebarNav({
   return (
     <SidebarContent>
       <nav aria-label="Main" className="contents">
-      <SidebarGroup>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <NavLink href="/dashboard">
-              <HomeIcon />
-              Home
-            </NavLink>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
-      <SidebarGroup>
-        <SidebarGroupLabel>Briefings</SidebarGroupLabel>
-        <BriefingDialog
-          voices={voices}
-          trigger={
-            <SidebarGroupAction aria-label="New briefing" className="size-6">
-              <PlusIcon />
-            </SidebarGroupAction>
-          }
-        />
-        <SidebarGroupContent>
+        <SidebarGroup>
           <SidebarMenu>
-            {briefings.map((b) => (
-              <SidebarMenuItem key={b.id}>
-                <NavLink href={`/dashboard?briefing=${b.id}`} briefingId={b.id} size="lg">
-                  <CoverArt topic={b.topic} className="size-8" />
-                  <span className="grid min-w-0 leading-tight">
-                    <span className="truncate">{b.topic}</span>
-                    <span className="truncate text-mac-footnote text-muted-foreground">
-                      {b.is_active
-                        ? `Daily at ${formatTime(b.delivery_time)}`
-                        : "Paused"}
-                    </span>
-                  </span>
-                </NavLink>
-              </SidebarMenuItem>
-            ))}
+            <SidebarMenuItem>
+              <NavLink href="/dashboard">
+                <HomeIcon />
+                Home
+              </NavLink>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <FeedDialog />
+            </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Briefings</SidebarGroupLabel>
+          <BriefingDialog
+            voices={voices}
+            trigger={
+              <SidebarGroupAction aria-label="New briefing" className="size-6">
+                <PlusIcon />
+              </SidebarGroupAction>
+            }
+          />
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {briefings.map((b) => (
+                <SidebarMenuItem key={b.id}>
+                  <NavLink
+                    href={`/dashboard?briefing=${b.id}`}
+                    briefingId={b.id}
+                    size="lg"
+                  >
+                    <CoverArt topic={b.topic} className="size-8" />
+                    <span className="grid min-w-0 leading-tight">
+                      <span className="truncate">{b.topic}</span>
+                      <span className="truncate text-mac-footnote text-muted-foreground">
+                        {b.is_active
+                          ? `Daily at ${formatTime(b.delivery_time)}`
+                          : "Paused"}
+                      </span>
+                    </span>
+                  </NavLink>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </nav>
     </SidebarContent>
   );
@@ -98,7 +105,11 @@ export function DesktopSidebar(props: {
       className="hidden w-60 bg-transparent md:flex"
     >
       {/* Decorative: the window cannot be closed or minimised in a browser. */}
-      <div data-window-drag-region inert className="flex h-13 shrink-0 items-center px-5">
+      <div
+        data-window-drag-region
+        inert
+        className="flex h-13 shrink-0 items-center px-5"
+      >
         <WindowControls />
       </div>
       <SidebarNav {...props} />

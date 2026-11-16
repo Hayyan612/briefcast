@@ -54,15 +54,13 @@ function Shell({
       <SidebarProvider className="contents">
         <Window className="size-full max-md:rounded-none max-md:shadow-none">
           {sidebar}
-          <WindowTitlebar className="gap-3 pr-4">
+          <WindowTitlebar className="h-13 gap-3 px-4 md:px-5">
             {mobileNav}
-            <WindowTitle className="max-sm:hidden">Briefcast</WindowTitle>
-            <div className="ml-auto flex min-w-0 flex-1 items-center justify-end gap-2">
-              <Suspense
-                fallback={
-                  <Skeleton className="h-7 w-full max-w-xs rounded-md" />
-                }
-              >
+            <WindowTitle className="pointer-events-auto static inset-auto min-w-0 flex-1 text-left text-mac-headline max-sm:sr-only">
+              Briefcast
+            </WindowTitle>
+            <div className="flex shrink-0 items-center gap-3 max-sm:flex-1">
+              <Suspense fallback={<Skeleton className="h-8 w-72 rounded-md" />}>
                 <SearchBox />
               </Suspense>
               {account}

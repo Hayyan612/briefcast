@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldGroup,
   FieldLabel,
@@ -30,7 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { VoiceFields } from "@/components/voice-fields";
 import {
   timezoneOptions,
   useBrowserTimezone,
@@ -74,12 +77,12 @@ export function BriefingDialog({
   );
   const timezone = chosenTz ?? detectedTz ?? "Asia/Kolkata";
   const [voice, setVoice] = useState(briefing?.voice ?? voices[0]?.id ?? "");
+  const [language, setLanguage] = useState(briefing?.language ?? "en-IN");
+  const [emailEnabled, setEmailEnabled] = useState(
+    briefing?.email_enabled ?? true,
+  );
 
   const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
-  const voiceItems = useMemo(
-    () => Object.fromEntries(voices.map((v) => [v.id, v.label])),
-    [voices],
-  );
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -90,6 +93,8 @@ export function BriefingDialog({
         delivery_time: time,
         timezone,
         voice,
+        language,
+        email_enabled: emailEnabled,
       });
       if (briefing) {
         await api(`/briefings/${briefing.id}`, { method: "PATCH", body });
@@ -174,25 +179,29 @@ export function BriefingDialog({
                 </Select>
               </Field>
             </div>
-            <Field>
-              <FieldLabel>Voice</FieldLabel>
-              <Select
-                items={voiceItems}
-                value={voice}
-                onValueChange={(v) => v && setVoice(v)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent alignItemWithTrigger={false}>
-                  {voices.map((v) => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FieldDescription>Gnani.ai Timbre voices.</FieldDescription>
+            <VoiceFields
+              voices={voices}
+              language={language}
+              voice={voice}
+              onChange={(next) => {
+                setLanguage(next.language);
+                setVoice(next.voice);
+              }}
+            />
+            <Field orientation="horizontal">
+              <FieldContent>
+                <FieldLabel htmlFor="email-enabled">
+                  Email me each episode
+                </FieldLabel>
+                <FieldDescription>
+                  A link arrives as soon as it is ready.
+                </FieldDescription>
+              </FieldContent>
+              <Switch
+                id="email-enabled"
+                checked={emailEnabled}
+                onCheckedChange={(v) => setEmailEnabled(v)}
+              />
             </Field>
           </FieldGroup>
           <DialogFooter>

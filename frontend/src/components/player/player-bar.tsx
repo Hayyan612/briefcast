@@ -130,9 +130,7 @@ function PlayerBarInner() {
         <div className="hidden items-center justify-end gap-2 md:flex">
           <DropdownMenu>
             <DropdownMenuTrigger
-              render={
-                <Button variant="ghost" aria-label="Playback speed" />
-              }
+              render={<Button variant="ghost" aria-label="Playback speed" />}
             >
               <GaugeIcon data-icon="inline-start" />
               {p.rate}×

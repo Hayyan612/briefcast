@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  DownloadIcon,
   EllipsisVerticalIcon,
   ExternalLinkIcon,
   RotateCcwIcon,
@@ -35,6 +36,19 @@ export function EpisodeRowActions({ episode }: { episode: EpisodeSummary }) {
           <ExternalLinkIcon />
           Open episode
         </DropdownMenuItem>
+        {episode.status === "ready" ? (
+          <DropdownMenuItem
+            render={
+              <a
+                href={`/api/backend/episodes/${episode.id}/audio?download=1`}
+                download
+              />
+            }
+          >
+            <DownloadIcon />
+            Download MP3
+          </DropdownMenuItem>
+        ) : null}
         {episode.status === "failed" ? (
           <DropdownMenuItem
             onClick={async () => {
