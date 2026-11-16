@@ -73,7 +73,14 @@ const GUESSES: [RegExp, CoverIcon, CoverColor][] = [
   [/\b(world|global|geopolit)/i, "globe", "blue"],
   [/\b(science|research|physics)/i, "atom", "purple"],
 ];
-const FALLBACK: CoverColor[] = ["blue", "purple", "pink", "orange", "teal", "indigo"];
+const FALLBACK: CoverColor[] = [
+  "blue",
+  "purple",
+  "pink",
+  "orange",
+  "teal",
+  "indigo",
+];
 
 /** The briefing's chosen cover, or a guess from its topic. */
 export function resolveCover(

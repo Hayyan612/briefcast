@@ -16,8 +16,11 @@
 :root,
 .light {
   /* Fonts. SF Pro is not redistributable; the system stack resolves to it on Apple devices. */
-  --font-macos: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", "Segoe UI", Inter, system-ui, sans-serif;
-  --font-macos-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-macos:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro",
+    "Helvetica Neue", "Segoe UI", Inter, system-ui, sans-serif;
+  --font-macos-mono:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Accents */
   --mac-blue: #0088ff;
@@ -85,7 +88,8 @@
   --mac-glass-selected: rgb(0 0 0 / 0.08);
   --mac-glass-edge: rgb(255 255 255 / 0.95);
   --mac-glass-rim: rgb(0 0 0 / 0.1);
-  --mac-glass-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 8px 15px rgb(0 0 0 / 0.04);
+  --mac-glass-shadow:
+    0 0 0 0.5px rgb(0 0 0 / 0.08), 0 8px 15px rgb(0 0 0 / 0.04);
 
   /* Materials (translucent, blurred backgrounds) */
   --mac-material-menu: rgb(244 244 246 / 0.74);
@@ -107,16 +111,28 @@
   --mac-traffic-edge: inset 0 0 0 0.5px rgb(0 0 0 / 0.12);
 
   /* Shadows */
-  --mac-shadow-menu: inset 0 0 0 1px rgb(255 255 255 / 0.55), 0 0 0 0.5px rgb(0 0 0 / 0.16), 0 8px 48px rgb(0 0 0 / 0.25);
-  --mac-shadow-popover: 0 0 0 0.5px var(--mac-material-border), 0 8px 48px rgb(0 0 0 / 0.2);
-  --mac-shadow-tooltip: 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 2px 8px rgb(0 0 0 / 0.15);
-  --mac-shadow-dock-label: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 2px 8px rgb(0 0 0 / 0.15);
+  --mac-shadow-menu:
+    inset 0 0 0 1px rgb(255 255 255 / 0.55), 0 0 0 0.5px rgb(0 0 0 / 0.16),
+    0 8px 48px rgb(0 0 0 / 0.25);
+  --mac-shadow-popover:
+    0 0 0 0.5px var(--mac-material-border), 0 8px 48px rgb(0 0 0 / 0.2);
+  --mac-shadow-tooltip:
+    0 0 0 0.5px rgb(0 0 0 / 0.12), 0 2px 8px rgb(0 0 0 / 0.15);
+  --mac-shadow-dock-label:
+    inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.12),
+    0 2px 8px rgb(0 0 0 / 0.15);
   /* Light catches the top and bottom edges of the Dock; the sides get a darker rim. */
-  --mac-shadow-dock: inset 0 1px 0 rgb(255 255 255 / 0.75), inset 0 -1px 0 rgb(255 255 255 / 0.55), inset 1px 0 0 rgb(0 0 0 / 0.1), inset -1px 0 0 rgb(0 0 0 / 0.1), inset 0 6px 6px -5px rgb(255 255 255 / 0.3), 0 8px 24px rgb(0 0 0 / 0.12);
+  --mac-shadow-dock:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -1px 0 rgb(255 255 255 / 0.55), inset 1px 0 0 rgb(0 0 0 / 0.1),
+    inset -1px 0 0 rgb(0 0 0 / 0.1),
+    inset 0 6px 6px -5px rgb(255 255 255 / 0.3), 0 8px 24px rgb(0 0 0 / 0.12);
   --mac-shadow-window: 0 0 1px rgb(0 0 0 / 0.8), 0 18px 54px rgb(0 0 0 / 0.3);
-  --mac-shadow-window-inactive: 0 0 1px rgb(0 0 0 / 0.8), 0 7px 21px rgb(0 0 0 / 0.2);
+  --mac-shadow-window-inactive:
+    0 0 1px rgb(0 0 0 / 0.8), 0 7px 21px rgb(0 0 0 / 0.2);
   --mac-window-rim: transparent;
-  --mac-focus-ring: 0 0 0 3.5px color-mix(in srgb, var(--mac-accent) 50%, transparent);
+  --mac-focus-ring: 0 0 0 3.5px
+    color-mix(in srgb, var(--mac-accent) 50%, transparent);
 
   /* Radii */
   --mac-radius-control: 6px;
@@ -240,17 +256,39 @@
 
   --mac-traffic-close: linear-gradient(#f4534a 45%, #ef6861);
   --mac-traffic-minimize: #fcba00;
-  --mac-traffic-zoom: linear-gradient(#2cc100, #00bc01 40%, #00bc01 55%, #4fc337);
+  --mac-traffic-zoom: linear-gradient(
+    #2cc100,
+    #00bc01 40%,
+    #00bc01 55%,
+    #4fc337
+  );
   --mac-traffic-inactive: #4b4d52;
-  --mac-traffic-edge: inset 0 0.75px 0 rgb(255 255 255 / 0.5), inset 0 -0.75px 0 rgb(255 255 255 / 0.4);
+  --mac-traffic-edge:
+    inset 0 0.75px 0 rgb(255 255 255 / 0.5),
+    inset 0 -0.75px 0 rgb(255 255 255 / 0.4);
 
-  --mac-shadow-menu: inset 0 0 0 1px rgb(255 255 255 / 0.1), 0 0 0 1px rgb(0 0 0 / 0.85), 0 8px 48px rgb(0 0 0 / 0.45);
-  --mac-shadow-popover: 0 0 0 0.5px var(--mac-material-border), 0 0 0 1px rgb(0 0 0 / 0.5), 0 8px 48px rgb(0 0 0 / 0.45);
-  --mac-shadow-tooltip: inset 0 0 0 0.6px rgb(255 255 255 / 0.15), 0 0 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.2);
-  --mac-shadow-dock-label: inset 0 1px 0 rgb(255 255 255 / 0.18), inset 0 5px 5px -4px rgb(255 255 255 / 0.07);
-  --mac-shadow-dock: inset 0 1px 0 rgb(190 215 255 / 0.34), inset 0 -1px 0 rgb(190 215 255 / 0.33), inset 1px 0 0 rgb(0 0 0 / 0.8), inset -1px 0 0 rgb(0 0 0 / 0.8), inset 0 6px 6px -5px rgb(190 215 255 / 0.1), inset 0 -6px 6px -5px rgb(190 215 255 / 0.09), 0 8px 24px rgb(0 0 0 / 0.2);
-  --mac-shadow-window: 0 0 0 1px rgb(0 0 0 / 0.92), 0 18px 54px rgb(0 0 0 / 0.57);
-  --mac-shadow-window-inactive: 0 0 0 1px rgb(0 0 0 / 0.92), 0 7px 21px rgb(0 0 0 / 0.35);
+  --mac-shadow-menu:
+    inset 0 0 0 1px rgb(255 255 255 / 0.1), 0 0 0 1px rgb(0 0 0 / 0.85),
+    0 8px 48px rgb(0 0 0 / 0.45);
+  --mac-shadow-popover:
+    0 0 0 0.5px var(--mac-material-border), 0 0 0 1px rgb(0 0 0 / 0.5),
+    0 8px 48px rgb(0 0 0 / 0.45);
+  --mac-shadow-tooltip:
+    inset 0 0 0 0.6px rgb(255 255 255 / 0.15), 0 0 2px rgb(0 0 0 / 0.4),
+    0 2px 8px rgb(0 0 0 / 0.2);
+  --mac-shadow-dock-label:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    inset 0 5px 5px -4px rgb(255 255 255 / 0.07);
+  --mac-shadow-dock:
+    inset 0 1px 0 rgb(190 215 255 / 0.34),
+    inset 0 -1px 0 rgb(190 215 255 / 0.33), inset 1px 0 0 rgb(0 0 0 / 0.8),
+    inset -1px 0 0 rgb(0 0 0 / 0.8),
+    inset 0 6px 6px -5px rgb(190 215 255 / 0.1),
+    inset 0 -6px 6px -5px rgb(190 215 255 / 0.09), 0 8px 24px rgb(0 0 0 / 0.2);
+  --mac-shadow-window:
+    0 0 0 1px rgb(0 0 0 / 0.92), 0 18px 54px rgb(0 0 0 / 0.57);
+  --mac-shadow-window-inactive:
+    0 0 0 1px rgb(0 0 0 / 0.92), 0 7px 21px rgb(0 0 0 / 0.35);
   --mac-window-rim: rgb(255 255 255 / 0.1);
 }
 
@@ -473,14 +511,19 @@
 
 @utility mac-material-dock {
   background-color: var(--mac-material-dock);
-  -webkit-backdrop-filter: blur(var(--mac-material-blur)) saturate(var(--mac-material-dock-saturation, 180%)) brightness(var(--mac-material-dock-brightness, 1));
-  backdrop-filter: blur(var(--mac-material-blur)) saturate(var(--mac-material-dock-saturation, 180%)) brightness(var(--mac-material-dock-brightness, 1));
+  -webkit-backdrop-filter: blur(var(--mac-material-blur))
+    saturate(var(--mac-material-dock-saturation, 180%))
+    brightness(var(--mac-material-dock-brightness, 1));
+  backdrop-filter: blur(var(--mac-material-blur))
+    saturate(var(--mac-material-dock-saturation, 180%))
+    brightness(var(--mac-material-dock-brightness, 1));
 }
 
 /* The label above a Dock icon: a capsule with an arrow pointing at it. */
 @utility mac-material-dock-label {
   background-color: var(--mac-dock-label);
-  -webkit-backdrop-filter: blur(20px) saturate(var(--mac-dock-label-saturation, 180%));
+  -webkit-backdrop-filter: blur(20px)
+    saturate(var(--mac-dock-label-saturation, 180%));
   backdrop-filter: blur(20px) saturate(var(--mac-dock-label-saturation, 180%));
 }
 

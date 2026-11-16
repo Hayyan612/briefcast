@@ -36,7 +36,13 @@
 
 /* Touch screens: every control gets a 44 px hit area (Apple HIG, WCAG 2.5.5). */
 @media (pointer: coarse) {
-  :is(button, [role="button"], [role="switch"], [role="tab"], a[data-slot="button"]):not([inert] *) {
+  :is(
+    button,
+    [role="button"],
+    [role="switch"],
+    [role="tab"],
+    a[data-slot="button"]
+  ):not([inert] *) {
     min-height: 44px;
     min-width: 44px;
   }
@@ -45,15 +51,15 @@
 /* Click and hover feel: quick, physical, and off for reduced-motion users. */
 @media (prefers-reduced-motion: no-preference) {
   :is(
-      [data-slot="button"],
-      [data-slot="toggle"],
-      [data-slot="sidebar-menu-button"],
-      [data-slot="sidebar-group-action"],
-      [data-slot="dropdown-menu-item"],
-      [data-slot="tabs-trigger"],
-      [data-slot="switch"],
-      tbody tr
-    ) {
+    [data-slot="button"],
+    [data-slot="toggle"],
+    [data-slot="sidebar-menu-button"],
+    [data-slot="sidebar-group-action"],
+    [data-slot="dropdown-menu-item"],
+    [data-slot="tabs-trigger"],
+    [data-slot="switch"],
+    tbody tr
+  ) {
     transition:
       transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
       background-color 160ms ease,
@@ -87,11 +93,19 @@
 [data-closed] {
   animation-fill-mode: forwards !important;
 }
-:is([data-slot$="-overlay"], [data-slot$="-content"], [data-slot$="-popup"])[data-open] {
+:is(
+  [data-slot$="-overlay"],
+  [data-slot$="-content"],
+  [data-slot$="-popup"]
+)[data-open] {
   animation-duration: 200ms;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
-:is([data-slot$="-overlay"], [data-slot$="-content"], [data-slot$="-popup"])[data-closed] {
+:is(
+  [data-slot$="-overlay"],
+  [data-slot$="-content"],
+  [data-slot$="-popup"]
+)[data-closed] {
   animation-duration: 160ms !important;
   animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
@@ -102,18 +116,17 @@
   }
 }
 
-/*
- * The line being read looks bold without being bold: a hairline stroke thickens the
- * glyphs but keeps their advance widths, so the paragraph never re-wraps (real
- * font-weight changes would make the text jump each time the highlight moves).
- */
-.transcript-now {
-  -webkit-text-stroke: 0.55px currentColor;
-  paint-order: stroke fill;
+/* Lyrics panel: no scrollbar chrome, and lines fade out at the top and bottom edges. */
+.lyrics-scroll {
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 14%,
+    #000 82%,
+    transparent
+  );
 }
-@media (forced-colors: active) {
-  .transcript-now {
-    -webkit-text-stroke: 0;
-    font-weight: 600;
-  }
+.lyrics-scroll::-webkit-scrollbar {
+  display: none;
 }

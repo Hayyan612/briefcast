@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 import { PlayPauseGlyph } from "@/components/player/play-button";
 import { usePlayer } from "@/components/player/player-provider";
+import { OPEN_EVENT } from "@/components/player/now-playing-event";
 import { Transcript } from "@/components/transcript";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,12 +31,6 @@ function clock(seconds: number) {
   return formatDuration(Math.floor(seconds) || 0).replace("—", "0:00");
 }
 
-const OPEN_EVENT = "briefcast:open-now-playing";
-
-/** Open the Now Playing view from anywhere (player bar title, dashboard card…). */
-export function openNowPlaying() {
-  window.dispatchEvent(new Event(OPEN_EVENT));
-}
 
 /** Spotify-style full view: big cover and controls beside the live transcript. */
 export function NowPlaying() {
@@ -142,26 +137,20 @@ export function NowPlaying() {
               Sources and agent log
             </Link>
           </section>
-          <section
-            data-transcript-scroll
-            className="min-h-0 overflow-y-auto px-6 py-8 md:px-12 md:py-12"
-          >
-            <h3 className="mb-6 text-mac-headline font-semibold text-muted-foreground">
-              Transcript
-            </h3>
+          <section className="min-h-0 p-4 md:p-6">
             {detail?.id === track.id && detail.transcript?.length ? (
               <Transcript
                 track={track}
                 lines={detail.transcript}
-                className="max-w-[60ch]"
+                variant="full"
               />
             ) : (
-              <div className="mx-auto grid max-w-[60ch] gap-3">
-                {Array.from({ length: 8 }, (_, i) => (
+              <div className="grid h-full content-center gap-4 rounded-mac-group bg-mac-fill-quaternary px-8">
+                {Array.from({ length: 6 }, (_, i) => (
                   <Skeleton
                     key={i}
-                    className="h-5"
-                    style={{ width: `${70 + ((i * 37) % 30)}%` }}
+                    className="h-7"
+                    style={{ width: `${60 + ((i * 37) % 35)}%` }}
                   />
                 ))}
               </div>

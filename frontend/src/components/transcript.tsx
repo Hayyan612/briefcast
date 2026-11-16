@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
-import { ArrowDownIcon } from "@/components/icons";
+import { ArrowDownIcon, ExpandIcon } from "@/components/icons";
+import { openNowPlaying } from "@/components/player/now-playing-event";
 import {
   usePlayer,
   type PlayerTrack,
 } from "@/components/player/player-provider";
 import { usePlaybackIndex } from "@/components/player/use-playback-index";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { TranscriptLine } from "@/lib/types";
 
@@ -61,138 +63,133 @@ function clock(s: number) {
 }
 
 /**
- * Spotify-style synced transcript. The line being spoken is highlighted and kept in
- * view; tapping a line plays from there. Following pauses while the listener scrolls.
+ * Lyrics-style transcript (as in Spotify and Apple Music): large bold lines, the spoken
+ * line in the primary label colour and kept centred, the rest in secondary. It scrolls inside its own
+ * panel, so a long transcript never stretches the page. Tapping a line plays from it.
  */
 export function Transcript({
   track,
   lines,
+  variant = "card",
   className,
 }: {
   track: PlayerTrack;
   lines: TranscriptLine[];
+  /** "card": fixed-height panel on a page. "full": fills its parent (Now Playing). */
+  variant?: "card" | "full";
   className?: string;
 }) {
   const player = usePlayer();
   const isCurrent = player.track?.id === track.id;
   const active = usePlaybackIndex(lines, track.id);
 
-  const container = useRef<HTMLDivElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [following, setFollowing] = useState(true);
   const programmatic = useRef(false);
 
-  // Keep the active line in view while following.
+  // Keep the spoken line centred while following.
   useEffect(() => {
-    if (!following || active < 0 || !isCurrent || !player.playing) return;
+    if (!following || active < 0 || !isCurrent) return;
     const el = lineRefs.current[active];
     if (!el) return;
     programmatic.current = true;
     centerLine(el);
     const t = setTimeout(() => (programmatic.current = false), SCROLL_MS + 80);
     return () => clearTimeout(t);
-  }, [active, following, isCurrent, player.playing]);
+  }, [active, following, isCurrent]);
 
-  // A manual scroll pauses following.
+  // A manual scroll pauses following until "Back to current line".
   useEffect(() => {
-    const scroller = container.current?.closest(
-      "[data-slot=window-content], [data-transcript-scroll]",
-    );
-    if (!scroller) return;
+    const el = scroller.current;
+    if (!el) return;
     const onScroll = () => {
       if (!programmatic.current) setFollowing(false);
     };
-    scroller.addEventListener("wheel", onScroll, { passive: true });
-    scroller.addEventListener("touchmove", onScroll, { passive: true });
+    el.addEventListener("wheel", onScroll, { passive: true });
+    el.addEventListener("touchmove", onScroll, { passive: true });
     return () => {
-      scroller.removeEventListener("wheel", onScroll);
-      scroller.removeEventListener("touchmove", onScroll);
+      el.removeEventListener("wheel", onScroll);
+      el.removeEventListener("touchmove", onScroll);
     };
   }, []);
 
-  const paragraphs = useMemo(() => {
-    const groups: {
-      p: number;
-      items: { line: TranscriptLine; i: number }[];
-    }[] = [];
-    lines.forEach((line, i) => {
-      const last = groups.at(-1);
-      if (last && last.p === line.p) last.items.push({ line, i });
-      else groups.push({ p: line.p, items: [{ line, i }] });
-    });
-    return groups;
-  }, [lines]);
+  const playFrom = (start: number) => {
+    setFollowing(true);
+    player.play(track, start);
+  };
 
   return (
-    <div ref={container} className={cn("relative", className)}>
-      {!isCurrent ? (
-        <p className="mb-5 text-mac-footnote text-muted-foreground">
-          Tap any line to play from there.
-        </p>
-      ) : null}
-      <div className="grid gap-7">
-        {paragraphs.map((group) => {
-          const first = group.items[0].line;
-          const groupActive = group.items.some(({ i }) => i === active);
-          return (
-            <div
-              key={group.p}
-              className="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-3"
+    <Card
+      role="region"
+      aria-label="Transcript"
+      className={cn(
+        "relative gap-0 overflow-hidden py-0",
+        variant === "card" ? "h-[min(30rem,62vh)]" : "h-full",
+        className,
+      )}
+    >
+      <header className="flex items-center justify-between gap-3 px-6 pt-5 pb-1 md:px-8">
+        <h2 className="text-mac-headline font-semibold text-mac-label-secondary">
+          Transcript
+        </h2>
+        <div className="flex items-center gap-2">
+          {!isCurrent ? (
+            <span className="text-mac-footnote text-mac-label-secondary max-sm:hidden">
+              Tap a line to play from there
+            </span>
+          ) : null}
+          {variant === "card" ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Open in Now Playing"
+              onClick={() => {
+                if (!isCurrent) player.play(track);
+                openNowPlaying();
+              }}
             >
-              <button
-                type="button"
-                tabIndex={-1}
-                aria-hidden
-                onClick={() => {
-                  setFollowing(true);
-                  player.play(track, first.start);
-                }}
-                className={cn(
-                  "mt-1.5 h-fit text-left text-mac-footnote tabular-nums transition-colors duration-300 hover:text-mac-accent",
-                  groupActive
-                    ? "font-semibold text-mac-accent"
-                    : "text-muted-foreground",
-                )}
-              >
-                {clock(first.start)}
-              </button>
-              <p className="text-[17px] leading-8 md:text-lg md:leading-9">
-                {group.items
-                  .map(({ line, i }) => {
-                    const state =
-                      i === active ? "now" : i < active ? "past" : "next";
-                    return (
-                      <button
-                        key={i}
-                        ref={(el) => {
-                          lineRefs.current[i] = el;
-                        }}
-                        type="button"
-                        onClick={() => {
-                          setFollowing(true);
-                          player.play(track, line.start);
-                        }}
-                        data-start={line.start}
-                      aria-current={state === "now" ? "true" : undefined}
-                        aria-label={`Play from ${clock(line.start)}: ${line.text}`}
-                        className={cn(
-                          // Real bold is wider and would re-wrap lines as the highlight moves, so the current
-                        // line is emboldened with a text stroke instead (.transcript-now in globals.css).
-                          "inline scroll-my-24 rounded-[5px] px-[3px] text-left [box-decoration-break:clone] transition-[color,background-color] duration-300 hover:bg-mac-fill-tertiary focus-visible:outline-2 focus-visible:outline-mac-accent",
-                          state === "now" && "transcript-now bg-mac-accent/12 text-mac-label",
-                          state === "past" && "text-mac-label-secondary",
-                          state === "next" && "text-mac-label",
-                        )}
-                      >
-                        {line.text}
-                      </button>
-                    );
-                  })
-                  .flatMap((el, k) => (k === 0 ? [el] : [" ", el]))}
-              </p>
-            </div>
-          );
-        })}
+              <ExpandIcon />
+            </Button>
+          ) : null}
+        </div>
+      </header>
+
+      <div
+        ref={scroller}
+        tabIndex={-1}
+        className="lyrics-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 md:px-8"
+      >
+        <ol className="grid gap-3 py-[30%] md:gap-4">
+          {lines.map((line, i) => {
+            const state = i === active ? "now" : i < active ? "past" : "next";
+            const paragraphStart = i > 0 && lines[i - 1].p !== line.p;
+            return (
+              <li key={i} className={cn(paragraphStart && "mt-5 md:mt-7")}>
+                <button
+                  ref={(el) => {
+                    lineRefs.current[i] = el;
+                  }}
+                  type="button"
+                  data-start={line.start}
+                  aria-current={state === "now" ? "true" : undefined}
+                  aria-label={`Play from ${clock(line.start)}: ${line.text}`}
+                  onClick={() => playFrom(line.start)}
+                  className={cn(
+                    "block w-full origin-left text-left text-[22px] leading-[1.28] font-bold tracking-[-0.015em] text-balance transition-[color,opacity,transform] duration-300 ease-out md:text-[28px]",
+                    "rounded-mac-item outline-offset-4 hover:text-mac-label focus-visible:outline-2 focus-visible:outline-mac-accent",
+                    // macOS label colours: the spoken line in primary, the rest in secondary.
+                    !isCurrent || state === "now"
+                      ? "text-mac-label"
+                      : "text-mac-label-secondary",
+                  )}
+                >
+                  {line.text}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
       </div>
 
       <AnimatePresence>
@@ -201,10 +198,9 @@ export function Transcript({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
-            className="pointer-events-none sticky bottom-4 flex justify-center"
+            className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center"
           >
             <Button
-              size="lg"
               className="pointer-events-auto shadow-mac-popover"
               onClick={() => {
                 setFollowing(true);
@@ -218,6 +214,6 @@ export function Transcript({
           </motion.div>
         ) : null}
       </AnimatePresence>
-    </div>
+    </Card>
   );
 }

@@ -18,6 +18,7 @@ from dataclasses import dataclass
 
 import httpx
 
+from app.align import align_transcript
 from app.config import get_settings
 from app.voices import split_voice
 
@@ -216,7 +217,8 @@ async def synthesize_script(
     """Return (mp3 bytes, duration in seconds, timed transcript).
 
     Each chunk's start and end come from the exact PCM length synthesised so far, so the
-    transcript stays in sync with the audio; only positions inside a chunk are estimated.
+    transcript stays in sync with the audio; positions inside a chunk are estimated, then
+    snapped to the real pauses in the encoded audio (app.align).
     """
     chunks = chunk_script(script)
     if not chunks:
@@ -235,4 +237,5 @@ async def synthesize_script(
                 paragraph += 1
             log.debug("tts chunk %d/%d done", i + 1, len(chunks))
     duration = round(seconds(len(pcm)))
-    return await encode_mp3(bytes(pcm)), duration, transcript
+    mp3 = await encode_mp3(bytes(pcm))
+    return mp3, duration, await align_transcript(transcript, mp3, seconds(len(pcm)))

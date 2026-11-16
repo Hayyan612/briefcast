@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import distinct_on
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.align import align_transcript, is_aligned
 from app.audio import audio_response, slug_filename
 from app.auth import CurrentUser
 from app.db import DbSession
@@ -245,10 +246,30 @@ async def get_episode(
     session: DbSession,
 ) -> EpisodeDetail:
     episode = await owned_episode(session, user, episode_id)
+    if (
+        episode.status == "ready"
+        and episode.duration_seconds
+        and not is_aligned(episode.transcript)
+    ):
+        await align_stored_transcript(session, episode)
     detail = EpisodeDetail.model_validate(episode)
     if not detail.transcript and episode.script and episode.duration_seconds:
         detail.transcript = approximate_transcript(episode.script, episode.duration_seconds)
     return detail
+
+
+async def align_stored_transcript(session: AsyncSession, episode: Episode) -> None:
+    """Snap an older episode's transcript to its audio once, and keep the result."""
+    audio = await session.get(EpisodeAudio, episode.id)
+    if audio is None:
+        return
+    lines = episode.transcript or (
+        approximate_transcript(episode.script, episode.duration_seconds) if episode.script else []
+    )
+    aligned = await align_transcript(lines, audio.data, float(episode.duration_seconds))
+    if is_aligned(aligned):
+        episode.transcript = aligned
+        await session.commit()
 
 
 @app.post("/episodes/{episode_id}/retry", response_model=EpisodeSummary, status_code=202)

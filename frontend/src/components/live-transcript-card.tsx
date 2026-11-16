@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { CoverArt } from "@/components/cover-art";
 import { TranscriptIcon } from "@/components/icons";
-import { openNowPlaying } from "@/components/player/now-playing";
+import { openNowPlaying } from "@/components/player/now-playing-event";
 import { PlayButton } from "@/components/player/play-button";
 import { usePlayer } from "@/components/player/player-provider";
 import { useLiveTranscript } from "@/components/player/use-live-transcript";

@@ -10,7 +10,8 @@ import {
 } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
-import { NowPlaying, openNowPlaying } from "@/components/player/now-playing";
+import { NowPlaying } from "@/components/player/now-playing";
+import { openNowPlaying } from "@/components/player/now-playing-event";
 import { useLiveTranscript } from "@/components/player/use-live-transcript";
 import { PlayPauseGlyph } from "@/components/player/play-button";
 import { usePlayer } from "@/components/player/player-provider";

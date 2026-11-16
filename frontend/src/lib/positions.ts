@@ -24,7 +24,10 @@ export function getPositions(): Positions {
 
 export function savePosition(id: string, t: number, d: number) {
   if (!Number.isFinite(t) || !Number.isFinite(d) || d <= 0) return;
-  const next = { ...getPositions(), [id]: { t: Math.round(t), d: Math.round(d) } };
+  const next = {
+    ...getPositions(),
+    [id]: { t: Math.round(t), d: Math.round(d) },
+  };
   cache = next;
   try {
     localStorage.setItem(KEY, JSON.stringify(next));

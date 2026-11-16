@@ -182,30 +182,32 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
         </TabsList>
 
         <TabsContent value="script">
-          <Card>
-            <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-4 text-[15px] leading-7 text-mac-label">
-              {ep.transcript?.length && ep.status === "ready" ? (
-                <Transcript
-                  track={{
-                    id: ep.id,
-                    title: ep.title ?? ep.topic,
-                    topic: ep.topic,
-                    icon: ep.icon,
-                    color: ep.color,
-                  }}
-                  lines={ep.transcript}
-                />
-              ) : ep.script ? (
-                ep.script.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)
-              ) : (
-                <div className="grid gap-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-11/12" />
-                  <Skeleton className="h-4 w-4/5" />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {ep.transcript?.length && ep.status === "ready" ? (
+            <Transcript
+              track={{
+                id: ep.id,
+                title: ep.title ?? ep.topic,
+                topic: ep.topic,
+                icon: ep.icon,
+                color: ep.color,
+              }}
+              lines={ep.transcript}
+            />
+          ) : (
+            <Card>
+              <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-4 text-[15px] leading-7 text-mac-label">
+                {ep.script ? (
+                  ep.script.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)
+                ) : (
+                  <div className="grid gap-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-11/12" />
+                    <Skeleton className="h-4 w-4/5" />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="sources">
