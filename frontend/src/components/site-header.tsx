@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { auth, signOut } from "@/auth";
@@ -6,6 +7,7 @@ import { UserMenu } from "@/components/user-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 
 async function HeaderUser() {
+  await connection(); // session reads are request-time; never prerender them
   const session = await auth();
   if (!session?.user) return null;
   async function signOutAction() {

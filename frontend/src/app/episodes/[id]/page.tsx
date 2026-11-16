@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -74,6 +75,7 @@ function describeStep(step: ResearchStep): string {
 }
 
 async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
+  await connection(); // session reads are request-time; never prerender them
   const { id } = await params;
   const session = await auth();
   if (!session?.user)

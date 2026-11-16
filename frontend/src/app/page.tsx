@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
 import { AudioLinesIcon, ClockIcon, MailIcon, SearchIcon } from "lucide-react";
@@ -52,6 +53,7 @@ async function SignInCta({
 }: {
   searchParams: PageProps<"/">["searchParams"];
 }) {
+  await connection(); // session reads are request-time; never prerender them
   const session = await auth();
   const { callbackUrl } = await searchParams;
   const next =

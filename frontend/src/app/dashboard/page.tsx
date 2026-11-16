@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { HeadphonesIcon, PlusIcon, RadioIcon } from "lucide-react";
@@ -27,6 +28,7 @@ import {
 } from "@/lib/types";
 
 async function DashboardContent() {
+  await connection(); // session reads are request-time; never prerender them
   const session = await auth();
   if (!session?.user) redirect("/");
 
