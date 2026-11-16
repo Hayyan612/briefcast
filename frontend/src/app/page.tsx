@@ -12,6 +12,7 @@ import { Landscape } from "@/components/landing/landscape";
 import { SamplePlayer } from "@/components/landing/sample-player";
 import { FeatureSection, Shot, TwoTone } from "@/components/landing/sections";
 import { LinkButton } from "@/components/link-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LANGUAGES } from "@/lib/languages";
@@ -123,6 +124,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
             >
               Questions
             </a>
+            <ThemeToggle />
             <Suspense fallback={<Skeleton className="h-7 w-40 rounded-full" />}>
               <SignInCta searchParams={searchParams} size="default" />
             </Suspense>

@@ -23,7 +23,7 @@ export function AppearanceMenu() {
     <DropdownMenuGroup>
       <DropdownMenuLabel>Appearance</DropdownMenuLabel>
       <DropdownMenuRadioGroup
-        value={theme ?? "system"}
+        value={theme ?? "light"}
         onValueChange={(v) => setTheme(v)}
       >
         {OPTIONS.map(({ value, label, Icon }) => (
