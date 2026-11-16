@@ -13,7 +13,7 @@ const toggleVariants = cva(
       variant: {
         default: "bg-transparent",
         outline:
-          "bg-mac-control hover:bg-mac-control-pressed data-pressed:bg-mac-control-pressed data-pressed:text-mac-accent",
+          "bg-mac-control hover:bg-mac-control-pressed data-pressed:bg-mac-control-pressed data-pressed:text-mac-label data-pressed:shadow-[inset_0_0_0_1.5px_var(--mac-accent)]",
       },
       size: {
         default: "h-6 min-w-6 px-2",

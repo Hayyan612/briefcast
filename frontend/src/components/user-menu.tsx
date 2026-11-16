@@ -1,5 +1,6 @@
 "use client";
 
+import { AppearanceMenu } from "@/components/appearance-menu";
 import { ChevronsUpDownIcon, LogOutIcon } from "@/components/icons";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -54,6 +55,8 @@ export function UserMenu({
           <div className="truncate text-mac-callout font-normal">{email}</div>
         </DropdownMenuLabel>
       </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+      <AppearanceMenu />
       <DropdownMenuSeparator />
       <DropdownMenuItem onClick={() => void signOutAction()}>
         <LogOutIcon />

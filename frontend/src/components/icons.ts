@@ -57,4 +57,7 @@ export {
   TrashBinMinimalisticIcon as Trash2Icon,
   VolumeCrossIcon as VolumeXIcon,
   VolumeLoudIcon as Volume2Icon,
+  MonitorIcon,
+  MoonIcon,
+  SunIcon,
 } from "@solar-icons/react/linear";

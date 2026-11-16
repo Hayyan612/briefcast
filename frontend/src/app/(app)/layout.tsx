@@ -44,7 +44,7 @@ function Shell({
   children: ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 bg-[#e5e5ea] md:p-4">
+    <div className="fixed inset-0 bg-(--app-backdrop) md:p-4">
       <a
         href="#content"
         className="sr-only z-50 rounded-mac-control bg-mac-accent px-3 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
@@ -60,7 +60,9 @@ function Shell({
               Briefcast
             </WindowTitle>
             <div className="flex shrink-0 items-center gap-3 max-sm:flex-1">
-              <Suspense fallback={<Skeleton className="h-8 w-72 rounded-mac-control" />}>
+              <Suspense
+                fallback={<Skeleton className="h-8 w-72 rounded-mac-control" />}
+              >
                 <SearchBox />
               </Suspense>
               {account}

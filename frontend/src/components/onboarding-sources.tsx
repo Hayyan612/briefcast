@@ -69,7 +69,7 @@ export function OnboardingSources({
               className="h-auto flex-col items-start gap-0.5 px-3 py-2.5 text-left whitespace-normal"
             >
               <span className="font-semibold">{l.label}</span>
-              <span className="text-mac-callout font-normal text-mac-label-secondary">
+              <span className="text-mac-callout font-normal text-mac-label-secondary in-data-pressed:text-mac-label">
                 {l.hint}
               </span>
             </ToggleGroupItem>

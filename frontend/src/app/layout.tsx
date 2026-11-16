@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
+import { ThemeProvider } from "next-themes";
+
 import { MotionProvider } from "@/components/motion-provider";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,8 +17,11 @@ const inter = Inter({
 });
 
 export const viewport: Viewport = {
-  colorScheme: "light",
-  themeColor: "#f7f7fb",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f7fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e1f20" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -27,12 +32,23 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
       <body className="flex min-h-full flex-col font-sans">
-        <MotionProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-        </MotionProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <MotionProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </MotionProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

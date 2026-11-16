@@ -9,15 +9,30 @@
 }
 
 /*
- * Light appearance only, even when the OS is in dark mode.
- * Two macOS tokens are nudged to meet WCAG AA, everything else is stock macOS 27:
- *   accent  #0088ff → #0071e3 (white label on a filled button: 3.5:1 → 4.7:1)
- *   secondary label 50% → 60% black (3.8:1 → 5.4:1 on the lightest surfaces)
+ * Light and dark appearance, following the system unless the viewer picks one
+ * (next-themes puts .light or .dark on <html>). Stock macOS 27 colours, except where
+ * they miss WCAG AA:
+ *   accent fill  #0088ff → #0071e3 in both modes (white label: 3.5:1 → 4.7:1)
+ *   light: secondary label 50% → 60% black (3.8:1 → 5.4:1 on the lightest surfaces)
+ *   dark: accent-coloured text uses the dark link blue #419cff (5.8:1), because
+ *         #0071e3 text on the dark window is only 3.5:1
  */
 :root {
   color-scheme: light;
   --mac-accent: #0071e3;
+  --app-backdrop: #e5e5ea;
+}
+:root:not(.dark) {
   --mac-label-secondary: rgb(0 0 0 / 0.6);
+}
+.dark {
+  color-scheme: dark;
+  --app-backdrop: #0b0b0c;
+}
+@layer utilities {
+  .dark .text-mac-accent {
+    color: var(--mac-link);
+  }
 }
 
 /* Entrance motion: a short rise-in, staggered via --i. Off for reduced-motion users. */
@@ -139,7 +154,8 @@
 /* Same type everywhere: San Francisco on Apple devices, Inter (bundled) elsewhere,
    instead of Segoe UI on Windows and Roboto on Android. */
 :root {
-  --font-macos: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro",
+  --font-macos:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro",
     var(--font-inter), "Helvetica Neue", system-ui, sans-serif;
 }
 
