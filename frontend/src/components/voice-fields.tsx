@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { LanguagesIcon, PauseIcon, PlayIcon } from "@/components/icons";
 import { usePlayer } from "@/components/player/player-provider";
@@ -106,6 +106,10 @@ export function VoiceFields({
   );
 }
 
+function previewUrl(voice: string, language: string) {
+  return `/api/backend/voices/${encodeURIComponent(voice)}/preview?language=${language}`;
+}
+
 function PreviewButton({
   voice,
   language,
@@ -116,37 +120,53 @@ function PreviewButton({
   const player = usePlayer();
   const audio = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "playing">("idle");
+  // True while a sample is loading or playing (read when the choice changes).
+  const active = useRef(false);
 
-  // Stop the sample if the choice changes or the form closes.
+  /** Start the sample for the current choice; events from a replaced sample are ignored. */
+  const start = useCallback(
+    (forVoice: string, forLanguage: string) => {
+      audio.current?.pause();
+      if (player.playing) player.toggle(); // never talk over the episode
+      const el = new Audio(previewUrl(forVoice, forLanguage));
+      audio.current = el;
+      const current = () => audio.current === el;
+      el.onplaying = () => current() && setState("playing");
+      const stop = () => {
+        active.current = false;
+        setState("idle");
+      };
+      el.onended = () => current() && stop();
+      el.onerror = () => {
+        if (!current()) return;
+        stop();
+        notify.error("Could not load the voice sample");
+      };
+      el.play().catch(() => current() && stop());
+    },
+    [player],
+  );
+
+  // Switching voice or language mid-sample plays the new voice straight away,
+  // so voices can be compared back to back.
   useEffect(() => {
-    return () => {
-      audio.current?.pause();
-    };
-  }, [voice, language]);
+    if (active.current) start(voice, language);
+  }, [voice, language, start]);
 
-  async function toggle() {
-    if (state === "playing") {
+  // Stop the sample when the form closes.
+  useEffect(() => () => audio.current?.pause(), []);
+
+  function toggle() {
+    if (state !== "idle") {
       audio.current?.pause();
+      audio.current = null;
+      active.current = false;
       setState("idle");
       return;
     }
-    if (player.playing) player.toggle(); // never talk over the episode
-    const el = new Audio(
-      `/api/backend/voices/${encodeURIComponent(voice)}/preview?language=${language}`,
-    );
-    audio.current = el;
-    el.onplaying = () => setState("playing");
-    el.onended = () => setState("idle");
-    el.onerror = () => {
-      setState("idle");
-      notify.error("Could not load the voice sample");
-    };
+    active.current = true;
     setState("loading");
-    try {
-      await el.play();
-    } catch {
-      setState("idle");
-    }
+    start(voice, language);
   }
 
   const label = state === "playing" ? "Stop sample" : "Play voice sample";
