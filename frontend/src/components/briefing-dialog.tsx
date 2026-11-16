@@ -146,7 +146,7 @@ export function BriefingDialog({
       <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-lg">
         <form onSubmit={save} className="grid gap-5">
           <DialogHeader>
-            <DialogTitle className="font-heading text-xl">
+            <DialogTitle className="text-mac-title-2">
               {briefing ? "Edit briefing" : "New daily briefing"}
             </DialogTitle>
             <DialogDescription>

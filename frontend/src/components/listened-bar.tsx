@@ -33,7 +33,7 @@ export function ListenedBar({ episodeId }: { episodeId: string }) {
           style={{ width: `${fraction * 100}%` }}
         />
       </span>
-      <span className="text-mac-footnote text-muted-foreground tabular-nums">
+      <span className="text-mac-footnote text-mac-label-secondary tabular-nums">
         {Math.max(1, Math.round((pos.d - pos.t) / 60))} min left
       </span>
     </span>

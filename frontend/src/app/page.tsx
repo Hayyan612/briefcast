@@ -70,7 +70,7 @@ async function SignInCta({
       : "/dashboard";
   if (session?.user) {
     return (
-      <LinkButton href={next} size="lg" className="h-11 w-fit px-5 text-base">
+      <LinkButton href={next} size="lg" className="w-fit">
         Open your briefings
       </LinkButton>
     );
@@ -81,7 +81,7 @@ async function SignInCta({
   }
   return (
     <form action={signInWithGoogle}>
-      <Button size="lg" type="submit" className="h-11 px-5 text-base">
+      <Button size="lg" type="submit">
         Continue with Google
       </Button>
     </form>
@@ -97,10 +97,10 @@ export default function Home({ searchParams }: PageProps<"/">) {
           <Badge variant="secondary" className="w-fit">
             Scheduled research-to-podcast agent
           </Badge>
-          <h1 className="font-heading text-4xl leading-tight font-semibold tracking-tight md:text-6xl">
+          <h1 className="text-[34px] leading-tight font-bold tracking-tight md:text-[52px]">
             Your own five-minute news show, on any topic.
           </h1>
-          <p className="max-w-md text-lg text-muted-foreground">
+          <p className="max-w-md text-mac-title-2 text-mac-label-secondary">
             Tell Briefcast what to follow and when you want it. Every day it
             researches the topic from fresh sources, writes a script and records
             it for you.
@@ -111,7 +111,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
         </section>
         <Card>
           <CardHeader>
-            <CardTitle className="font-heading text-xl">How it works</CardTitle>
+            <CardTitle className="text-mac-title-2">How it works</CardTitle>
             <CardDescription>
               From a sentence to a daily episode.
             </CardDescription>
@@ -134,7 +134,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
           </CardContent>
         </Card>
       </div>
-      <footer className="text-sm text-muted-foreground">
+      <footer className="text-mac-body text-mac-label-secondary">
         <LinkButton href="/privacy" variant="link" size="sm" className="px-0">
           Privacy policy
         </LinkButton>

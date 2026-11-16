@@ -133,7 +133,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
                   <LocalTime iso={ep.scheduled_for} />
                 </Badge>
               </div>
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle className="text-mac-title-1 font-bold">
                 {ep.title ?? ep.topic}
               </CardTitle>
               <CardDescription>{ep.topic}</CardDescription>
@@ -143,7 +143,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
             {inProgress ? (
               <div className="grid gap-2">
                 <Progress value={STATUS_PROGRESS[ep.status]} />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-mac-body text-mac-label-secondary">
                   {STATUS_LABEL[ep.status]}… This page updates by itself. You’ll
                   also get an email when it’s ready.
                 </p>
@@ -195,7 +195,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
             />
           ) : (
             <Card>
-              <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-4 text-[15px] leading-7 text-mac-label">
+              <CardContent className="mx-auto grid w-full max-w-[68ch] gap-5 py-4 text-mac-title-3 leading-7 text-mac-label">
                 {ep.script ? (
                   ep.script.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)
                 ) : (
@@ -232,13 +232,13 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
                     </ItemDescription>
                   </ItemContent>
                   <ItemActions>
-                    <ExternalLinkIcon className="size-4 text-muted-foreground" />
+                    <ExternalLinkIcon className="size-4 text-mac-label-secondary" />
                   </ItemActions>
                 </Item>
               ))}
             </ItemGroup>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-mac-body text-mac-label-secondary">
               Sources appear once research is done.
             </p>
           )}
@@ -272,7 +272,7 @@ async function EpisodeContent({ params }: { params: Promise<{ id: string }> }) {
               ))}
             </ItemGroup>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-mac-body text-mac-label-secondary">
               The agent’s steps appear here.
             </p>
           )}

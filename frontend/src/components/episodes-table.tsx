@@ -56,9 +56,9 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                     }}
                   />
                 ) : IN_PROGRESS.includes(ep.status) ? (
-                  <Spinner className="mx-auto text-primary" />
+                  <Spinner className="mx-auto text-mac-accent" />
                 ) : (
-                  <CircleAlertIcon className="mx-auto size-4 text-destructive" />
+                  <CircleAlertIcon className="mx-auto size-4 text-mac-red" />
                 )}
               </TableCell>
               <TableCell className="max-w-0 w-full">
@@ -73,10 +73,10 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                     className="size-9 rounded-[9px]"
                   />
                   <span className="grid min-w-0 gap-0.5">
-                    <span className="truncate font-semibold group-hover:text-primary">
+                    <span className="truncate font-semibold group-hover:text-mac-accent">
                       {title}
                     </span>
-                    <span className="truncate text-xs text-muted-foreground">
+                    <span className="truncate text-mac-callout text-mac-label-secondary">
                       {ep.topic} ·{" "}
                       {ep.trigger === "manual" ? "Run now" : "Scheduled"}
                     </span>
@@ -84,10 +84,10 @@ export function EpisodesTable({ episodes }: { episodes: EpisodeSummary[] }) {
                   </span>
                 </Link>
               </TableCell>
-              <TableCell className="hidden text-muted-foreground lg:table-cell">
+              <TableCell className="hidden text-mac-label-secondary lg:table-cell">
                 <LocalTime iso={ep.created_at} />
               </TableCell>
-              <TableCell className="hidden text-muted-foreground tabular-nums sm:table-cell">
+              <TableCell className="hidden text-mac-label-secondary tabular-nums sm:table-cell">
                 {formatDuration(ep.duration_seconds)}
               </TableCell>
               <TableCell className="hidden md:table-cell">

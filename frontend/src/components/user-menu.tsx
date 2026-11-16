@@ -51,7 +51,7 @@ export function UserMenu({
       <DropdownMenuGroup>
         <DropdownMenuLabel>
           <div className="font-medium text-foreground">{name}</div>
-          <div className="truncate text-xs font-normal">{email}</div>
+          <div className="truncate text-mac-callout font-normal">{email}</div>
         </DropdownMenuLabel>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
@@ -71,7 +71,7 @@ export function UserMenu({
               {avatar}
               <span className="grid min-w-0 flex-1 text-left leading-tight">
                 <span className="truncate font-medium">{name}</span>
-                <span className="truncate text-xs text-muted-foreground">
+                <span className="truncate text-mac-callout text-mac-label-secondary">
                   {email}
                 </span>
               </span>

@@ -66,7 +66,7 @@ function PlayerBarInner() {
           type="button"
           onClick={openNowPlaying}
           aria-label={`Open Now Playing: ${p.track.title}`}
-          className="flex min-w-0 items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-mac-accent"
+          className="flex min-w-0 items-center gap-3 rounded-mac-item text-left focus-visible:outline-2 focus-visible:outline-mac-accent"
         >
           <CoverArt
             topic={p.track.topic}
@@ -75,7 +75,7 @@ function PlayerBarInner() {
             className="size-12"
           />
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{p.track.title}</p>
+            <p className="truncate text-mac-body font-semibold">{p.track.title}</p>
             <LiveCaption fallback={p.track.topic} />
           </div>
         </button>
@@ -122,7 +122,7 @@ function PlayerBarInner() {
             </Tooltip>
             <NowPlaying />
           </div>
-          <div className="hidden w-full items-center gap-3 text-xs text-muted-foreground tabular-nums md:flex">
+          <div className="hidden w-full items-center gap-3 text-mac-callout text-mac-label-secondary tabular-nums md:flex">
             <span className="w-10 text-right">{clock(p.time)}</span>
             <Slider
               aria-label="Seek"
@@ -180,9 +180,9 @@ function PlayerBarInner() {
         </div>
       </div>
       {/* Thin progress line on phones, where the seek bar is hidden. */}
-      <div className="h-0.5 bg-muted md:hidden">
+      <div className="h-0.5 bg-mac-fill-tertiary md:hidden">
         <div
-          className="h-full bg-primary transition-[width] duration-300 ease-linear"
+          className="h-full bg-mac-accent transition-[width] duration-300 ease-linear"
           style={{ width: `${p.duration ? (p.time / p.duration) * 100 : 0}%` }}
         />
       </div>
@@ -203,7 +203,7 @@ function LiveCaption({ fallback }: { fallback: string }) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -12, opacity: 0 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="truncate text-xs text-muted-foreground"
+          className="truncate text-mac-callout text-mac-label-secondary"
         >
           {line ? line.text : fallback}
         </motion.p>

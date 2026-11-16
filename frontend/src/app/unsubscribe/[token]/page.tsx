@@ -86,7 +86,7 @@ async function Unsubscribe({ params }: { params: Promise<{ token: string }> }) {
         </CardTitle>
         <CardDescription>“{info.topic}”</CardDescription>
       </CardHeader>
-      <CardContent className="text-mac-callout text-muted-foreground">
+      <CardContent className="text-mac-callout text-mac-label-secondary">
         The briefing keeps running. New episodes still appear in the app and in
         your podcast feed; only the emails stop.
       </CardContent>
@@ -110,7 +110,7 @@ export default function UnsubscribePage({
   return (
     <main className="mx-auto grid min-h-svh w-full max-w-md content-center gap-6 px-5 py-10">
       <Brand />
-      <Suspense fallback={<Skeleton className="h-56 rounded-xl" />}>
+      <Suspense fallback={<Skeleton className="h-56 rounded-mac-card" />}>
         <Unsubscribe params={params} />
       </Suspense>
     </main>

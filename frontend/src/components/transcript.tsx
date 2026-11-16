@@ -176,7 +176,7 @@ export function Transcript({
                   aria-label={`Play from ${clock(line.start)}: ${line.text}`}
                   onClick={() => playFrom(line.start)}
                   className={cn(
-                    "block w-full origin-left text-left text-[22px] leading-[1.28] font-bold tracking-[-0.015em] text-balance transition-[color,opacity,transform] duration-300 ease-out md:text-[28px]",
+                    "relative isolate block w-full origin-left text-left text-[22px] leading-[1.28] font-bold tracking-[-0.015em] text-balance transition-[color,opacity,transform] duration-300 ease-out md:text-[28px]",
                     "rounded-mac-item outline-offset-4 hover:text-mac-label focus-visible:outline-2 focus-visible:outline-mac-accent",
                     // macOS label colours: the spoken line in primary, the rest in secondary.
                     !isCurrent || state === "now"
@@ -184,6 +184,18 @@ export function Transcript({
                       : "text-mac-label-secondary",
                   )}
                 >
+                  {isCurrent && state === "now" ? (
+                    <motion.span
+                      aria-hidden
+                      layoutId={`transcript-highlight-${variant}`}
+                      transition={{
+                        type: "spring",
+                        stiffness: 420,
+                        damping: 38,
+                      }}
+                      className="absolute -inset-x-3 -inset-y-1.5 -z-10 rounded-mac-item bg-mac-accent/10"
+                    />
+                  ) : null}
                   {line.text}
                 </button>
               </li>

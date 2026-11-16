@@ -145,7 +145,7 @@ export function Onboarding({
   return (
     <div className="mx-auto grid w-full max-w-xl gap-4 py-6 md:py-10">
       <div className="grid gap-2">
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-mac-body text-mac-label-secondary">
           <span>
             Step {step + 1} of {STEPS.length} · {STEPS[step]}
           </span>
@@ -170,10 +170,10 @@ export function Onboarding({
             {step === 0 ? (
               <>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold">
+                  <CardTitle className="text-mac-title-1 font-bold">
                     {first ? `Welcome, ${first}` : "Welcome to Briefcast"}
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-mac-title-3">
                     Pick a topic and a time. Every day you get a five-minute
                     podcast on it, researched from that day’s sources.
                   </CardDescription>
@@ -182,7 +182,7 @@ export function Onboarding({
                   <ItemGroup className="gap-2">
                     {HOW.map(({ icon: Icon, title, text }) => (
                       <Item key={title} variant="muted" size="sm">
-                        <ItemMedia variant="icon" className="text-primary">
+                        <ItemMedia variant="icon" className="text-mac-accent">
                           <Icon />
                         </ItemMedia>
                         <ItemContent>
@@ -204,10 +204,10 @@ export function Onboarding({
             {step === 1 ? (
               <>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold">
+                  <CardTitle className="text-mac-title-1 font-bold">
                     What should we follow?
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-mac-title-3">
                     Choose a starting point or write your own. Specific topics
                     make better episodes.
                   </CardDescription>
@@ -226,7 +226,7 @@ export function Onboarding({
                         <ToggleGroupItem
                           key={s}
                           value={s}
-                          className="h-auto justify-start py-2.5 text-left whitespace-normal aria-pressed:border-primary aria-pressed:bg-primary/10 aria-pressed:font-semibold aria-pressed:text-primary"
+                          className="h-auto justify-start py-2.5 text-left whitespace-normal aria-pressed:border-mac-accent aria-pressed:bg-mac-accent/10 aria-pressed:font-semibold aria-pressed:text-mac-accent"
                         >
                           {s}
                         </ToggleGroupItem>
@@ -262,10 +262,10 @@ export function Onboarding({
             {step === 2 ? (
               <>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold">
+                  <CardTitle className="text-mac-title-1 font-bold">
                     When, and in which language?
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-mac-title-3">
                     A new episode is ready at this time every day.
                   </CardDescription>
                 </CardHeader>
@@ -329,10 +329,10 @@ export function Onboarding({
             {step === 3 ? (
               <>
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold">
+                  <CardTitle className="text-mac-title-1 font-bold">
                     Ready to go
                   </CardTitle>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-mac-title-3">
                     We’ll make your first episode now, so you can hear it
                     straight away.
                   </CardDescription>
@@ -340,7 +340,7 @@ export function Onboarding({
                 <CardContent>
                   <ItemGroup className="gap-2">
                     <Item variant="outline">
-                      <ItemMedia variant="icon" className="text-primary">
+                      <ItemMedia variant="icon" className="text-mac-accent">
                         <SearchIcon />
                       </ItemMedia>
                       <ItemContent>
@@ -349,7 +349,7 @@ export function Onboarding({
                       </ItemContent>
                     </Item>
                     <Item variant="outline">
-                      <ItemMedia variant="icon" className="text-primary">
+                      <ItemMedia variant="icon" className="text-mac-accent">
                         <ClockIcon />
                       </ItemMedia>
                       <ItemContent>
@@ -361,7 +361,7 @@ export function Onboarding({
                       </ItemContent>
                     </Item>
                     <Item variant="outline">
-                      <ItemMedia variant="icon" className="text-primary">
+                      <ItemMedia variant="icon" className="text-mac-accent">
                         <AudioLinesIcon />
                       </ItemMedia>
                       <ItemContent>

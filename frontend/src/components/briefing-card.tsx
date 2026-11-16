@@ -173,7 +173,7 @@ export function BriefingCard({
           </DropdownMenu>
         </CardAction>
       </CardHeader>
-      <CardContent className="grid min-w-0 gap-3 text-mac-callout text-muted-foreground">
+      <CardContent className="grid min-w-0 gap-3 text-mac-callout text-mac-label-secondary">
         {briefing.is_active ? (
           <>
             Next episode <LocalTime iso={briefing.next_run_at} />

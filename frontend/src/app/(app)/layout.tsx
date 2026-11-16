@@ -47,7 +47,7 @@ function Shell({
     <div className="fixed inset-0 bg-[#e5e5ea] md:p-4">
       <a
         href="#content"
-        className="sr-only z-50 rounded-md bg-mac-accent px-3 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        className="sr-only z-50 rounded-mac-control bg-mac-accent px-3 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Skip to content
       </a>
@@ -60,7 +60,7 @@ function Shell({
               Briefcast
             </WindowTitle>
             <div className="flex shrink-0 items-center gap-3 max-sm:flex-1">
-              <Suspense fallback={<Skeleton className="h-8 w-72 rounded-md" />}>
+              <Suspense fallback={<Skeleton className="h-8 w-72 rounded-mac-control" />}>
                 <SearchBox />
               </Suspense>
               {account}
@@ -117,8 +117,8 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         fallback={
           <Shell sidebar={<SidebarSkeleton />}>
             <div className="grid gap-4">
-              <Skeleton className="h-48 rounded-xl" />
-              <Skeleton className="h-72 rounded-xl" />
+              <Skeleton className="h-48 rounded-mac-card" />
+              <Skeleton className="h-72 rounded-mac-card" />
             </div>
           </Shell>
         }

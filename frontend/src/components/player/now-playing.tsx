@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { CoverArt } from "@/components/cover-art";
 import {
+  ChevronDownIcon,
   ExpandIcon,
   Rewind15BackIcon,
   Rewind15ForwardIcon,
@@ -16,6 +17,7 @@ import { Transcript } from "@/components/transcript";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetTitle,
@@ -30,7 +32,6 @@ import type { EpisodeDetail } from "@/lib/types";
 function clock(seconds: number) {
   return formatDuration(Math.floor(seconds) || 0).replace("—", "0:00");
 }
-
 
 /** Spotify-style full view: big cover and controls beside the live transcript. */
 export function NowPlaying() {
@@ -74,9 +75,30 @@ export function NowPlaying() {
       </SheetTrigger>
       <SheetContent
         side="bottom"
-        className="h-[92svh] gap-0 overflow-hidden rounded-t-2xl p-0 sm:max-w-none"
+        showCloseButton={false}
+        className="flex h-[92svh] flex-col gap-0 overflow-hidden rounded-t-mac-window p-0 sm:max-w-none"
       >
-        <div className="grid h-full min-h-0 md:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+        <header className="relative flex h-12 shrink-0 items-center justify-between border-b border-mac-separator px-4 md:px-6">
+          <span
+            aria-hidden
+            className="absolute top-1.5 left-1/2 h-1 w-9 -translate-x-1/2 rounded-full bg-mac-fill-primary"
+          />
+          <span className="text-mac-headline font-semibold text-mac-label-secondary">
+            Now Playing
+          </span>
+          <SheetClose
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Close Now Playing"
+              />
+            }
+          >
+            <ChevronDownIcon />
+          </SheetClose>
+        </header>
+        <div className="grid min-h-0 flex-1 md:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
           <section className="flex flex-col gap-6 border-b p-6 md:border-r md:border-b-0 md:p-10">
             <CoverArt
               topic={track.topic}
@@ -98,7 +120,7 @@ export function NowPlaying() {
                 step={1}
                 onValueChange={(v) => p.seek(Array.isArray(v) ? v[0] : v)}
               />
-              <div className="flex justify-between text-mac-footnote text-muted-foreground tabular-nums">
+              <div className="flex justify-between text-mac-footnote text-mac-label-secondary tabular-nums">
                 <span>{clock(p.time)}</span>
                 <span>-{clock(Math.max(p.duration - p.time, 0))}</span>
               </div>

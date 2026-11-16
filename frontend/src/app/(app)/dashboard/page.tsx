@@ -90,7 +90,7 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
         <section className="grid gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-mac-title-2 font-bold">Episodes</h2>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-mac-body text-mac-label-secondary">
               {episodes.length} total
             </span>
           </div>
@@ -150,10 +150,10 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
 function DashboardSkeleton() {
   return (
     <div className="grid gap-6">
-      <Skeleton className="h-56 rounded-2xl" />
+      <Skeleton className="h-56 rounded-mac-card" />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <Skeleton className="h-96 rounded-2xl" />
-        <Skeleton className="h-64 rounded-2xl" />
+        <Skeleton className="h-96 rounded-mac-card" />
+        <Skeleton className="h-64 rounded-mac-card" />
       </div>
     </div>
   );

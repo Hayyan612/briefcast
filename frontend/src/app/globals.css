@@ -3,6 +3,11 @@
 @import "shadcn/tailwind.css";
 @import "./macos.css";
 
+@theme {
+  /* Cupertino Card's corner, for placeholders that stand in for cards. */
+  --radius-mac-card: 14px;
+}
+
 /*
  * Light appearance only, even when the OS is in dark mode.
  * Two macOS tokens are nudged to meet WCAG AA, everything else is stock macOS 27:

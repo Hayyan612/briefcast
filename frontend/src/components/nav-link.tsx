@@ -40,7 +40,7 @@ export function NavLink({
         <motion.span
           layoutId="sidebar-selection"
           aria-hidden
-          className="absolute inset-0 -z-10 rounded-md bg-mac-fill-primary"
+          className="absolute inset-0 -z-10 rounded-mac-item bg-mac-fill-primary"
           transition={{ type: "spring", stiffness: 500, damping: 40 }}
         />
       ) : null}

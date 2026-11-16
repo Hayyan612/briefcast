@@ -81,7 +81,7 @@ export function SidebarNav({
                     />
                     <span className="grid min-w-0 leading-tight">
                       <span className="truncate">{b.topic}</span>
-                      <span className="truncate text-mac-footnote text-muted-foreground">
+                      <span className="truncate text-mac-footnote text-mac-label-secondary">
                         {b.is_active
                           ? `Daily at ${formatTime(b.delivery_time)}`
                           : "Paused"}
@@ -135,7 +135,7 @@ export function SidebarSkeleton() {
       <div className="grid gap-2 p-3">
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className="flex h-10 items-center gap-2">
-            <Skeleton className="size-8 rounded-md" />
+            <Skeleton className="size-8 rounded-mac-control" />
             <Skeleton className="h-3.5 flex-1" />
           </div>
         ))}

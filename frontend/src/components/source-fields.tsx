@@ -81,17 +81,17 @@ export function SourceFields({
     <Collapsible
       open={open}
       onOpenChange={setOpen}
-      className="rounded-lg border"
+      className="rounded-mac-group border border-mac-separator"
     >
       <CollapsibleTrigger className="group flex w-full items-center gap-2 px-3 py-2.5 text-left">
-        <ChevronRightIcon className="size-4 text-muted-foreground transition-transform duration-200 group-data-[panel-open]:rotate-90" />
+        <ChevronRightIcon className="size-4 text-mac-label-secondary transition-transform duration-200 group-data-[panel-open]:rotate-90" />
         <span className="font-medium">Sources and websites</span>
         {customised ? (
           <Badge variant="secondary" className="ml-auto">
             Customised
           </Badge>
         ) : (
-          <span className="ml-auto text-mac-footnote text-muted-foreground">
+          <span className="ml-auto text-mac-footnote text-mac-label-secondary">
             Optional
           </span>
         )}

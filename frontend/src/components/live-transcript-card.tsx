@@ -62,7 +62,7 @@ export function LiveTranscriptCard() {
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                       className={cn(
                         pos === 1
-                          ? "line-clamp-2 h-12 text-[17px] leading-6 font-semibold text-mac-label"
+                          ? "line-clamp-2 h-12 text-mac-title-2 font-semibold text-mac-label"
                           : "h-5 truncate text-mac-callout leading-5 text-mac-label-secondary",
                       )}
                     >

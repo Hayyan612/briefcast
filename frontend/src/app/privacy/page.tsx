@@ -37,7 +37,7 @@ export default function PrivacyPage() {
       <Brand />
       <Card>
         <CardHeader>
-          <CardTitle className="font-heading text-3xl">
+          <CardTitle className="text-mac-large-title">
             Privacy policy
           </CardTitle>
           <CardDescription>
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           {SECTIONS.map((s) => (
             <section key={s.title} className="grid gap-1">
               <h2 className="font-medium">{s.title}</h2>
-              <p className="text-muted-foreground">{s.body}</p>
+              <p className="text-mac-label-secondary">{s.body}</p>
             </section>
           ))}
         </CardContent>
