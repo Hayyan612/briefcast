@@ -63,8 +63,24 @@ function hostname(url: string) {
 }
 
 function describeStep(step: ResearchStep): string {
-  if (step.tool === "search_web")
-    return `Searched “${step.query}” (${step.recency}) · ${step.hits} results`;
+  if (step.tool === "search_web") {
+    const skipped = step.skipped_repeats
+      ? ` · skipped ${step.skipped_repeats} already covered`
+      : "";
+    return `Searched “${step.query}” (${step.recency}) · ${step.hits} new results${skipped}`;
+  }
+  if (step.tool === "preload") {
+    const parts = [];
+    if (step.requested)
+      parts.push(
+        `${step.requested} link${step.requested === 1 ? "" : "s"} you added`,
+      );
+    if (step.watched)
+      parts.push(
+        `${step.watched} new page${step.watched === 1 ? "" : "s"} on followed sites`,
+      );
+    return `Read ${parts.join(" and ")}`;
+  }
   if (step.tool === "read_source") return `Read ${step.source} in full`;
   if (step.tool === "finish_research")
     return `Kept ${step.findings} grounded findings`;

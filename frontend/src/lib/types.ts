@@ -31,6 +31,9 @@ export interface ResearchStep {
   chars?: number;
   findings?: number;
   note?: string;
+  skipped_repeats?: number;
+  requested?: number;
+  watched?: number;
 }
 
 export interface EpisodeDetail extends EpisodeSummary {
@@ -48,6 +51,13 @@ export interface Briefing {
   voice: string;
   language: string;
   email_enabled: boolean;
+  trusted_domains: string[];
+  blocked_domains: string[];
+  region: string | null;
+  lookback: "day" | "week";
+  finance_mode: boolean;
+  watch_urls: string[];
+  pending_links: number;
   is_active: boolean;
   next_run_at: string;
   created_at: string;

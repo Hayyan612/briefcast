@@ -7,13 +7,16 @@ import { notify as toast } from "@/lib/notify";
 import {
   CalendarClockIcon,
   EllipsisIcon,
+  GlobalIcon,
   LanguagesIcon,
+  LinkIcon,
   MicIcon,
   PencilIcon,
   PlayIcon,
   Trash2Icon,
 } from "@/components/icons";
 
+import { AddLinkDialog } from "@/components/add-link-dialog";
 import { BriefingDialog } from "@/components/briefing-dialog";
 import { LocalTime } from "@/components/local-time";
 import { StatusBadge } from "@/components/status-badge";
@@ -69,6 +72,7 @@ export function BriefingCard({
   const [busy, setBusy] = useState<"run" | "toggle" | "delete" | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [addingLink, setAddingLink] = useState(false);
   const latest = briefing.latest_episode;
   const generating = latest ? IN_PROGRESS.includes(latest.status) : false;
   const voiceLabel = voices
@@ -115,6 +119,18 @@ export function BriefingCard({
           {!briefing.email_enabled ? (
             <Badge variant="outline">Email off</Badge>
           ) : null}
+          {briefing.watch_urls.length ? (
+            <Badge variant="outline">
+              <GlobalIcon data-icon="inline-start" />
+              Following {briefing.watch_urls.length}
+            </Badge>
+          ) : null}
+          {briefing.pending_links ? (
+            <Badge variant="outline">
+              <LinkIcon data-icon="inline-start" />
+              {briefing.pending_links} {briefing.pending_links === 1 ? "link" : "links"} queued
+            </Badge>
+          ) : null}
           {voiceLabel ? (
             <Badge variant="outline">
               <MicIcon data-icon="inline-start" />
@@ -139,6 +155,10 @@ export function BriefingCard({
               <DropdownMenuItem onClick={() => setEditing(true)}>
                 <PencilIcon />
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAddingLink(true)}>
+                <LinkIcon />
+                Add a link…
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -230,6 +250,11 @@ export function BriefingCard({
         briefing={briefing}
         open={editing}
         onOpenChange={setEditing}
+      />
+      <AddLinkDialog
+        briefing={briefing}
+        open={addingLink}
+        onOpenChange={setAddingLink}
       />
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>

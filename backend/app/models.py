@@ -66,6 +66,9 @@ class Briefing(Base):
     finance_mode: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     # Websites to follow: new pages on them become sources.
     watch_urls: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    # Cover art (None = chosen automatically from the topic).
+    icon: Mapped[str | None] = mapped_column(String(24))
+    color: Mapped[str | None] = mapped_column(String(16))
     # Next due instant in UTC. The scheduler only ever compares this to now().
     next_run_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -124,7 +127,16 @@ class Episode(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     emailed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    briefing: Mapped[Briefing] = relationship(back_populates="episodes")
+    briefing: Mapped[Briefing] = relationship(back_populates="episodes", lazy="joined")
+
+    # The briefing's cover choice, shown with each episode.
+    @property
+    def icon(self) -> str | None:
+        return self.briefing.icon if self.briefing else None
+
+    @property
+    def color(self) -> str | None:
+        return self.briefing.color if self.briefing else None
 
 
 class EpisodeAudio(Base):

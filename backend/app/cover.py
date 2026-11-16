@@ -1,0 +1,36 @@
+"""Briefing cover choices: a Solar glyph on a macOS system color."""
+
+ICONS = (
+    "podcast",
+    "wallet",
+    "graph",
+    "cpu",
+    "gavel",
+    "heart",
+    "football",
+    "rocket",
+    "leaf",
+    "globe",
+    "buildings",
+    "lightbulb",
+    "shield",
+    "smartphone",
+    "cup",
+    "medal",
+    "case",
+    "sun",
+    "atom",
+    "chart",
+)
+COLORS = (
+    "blue",
+    "indigo",
+    "purple",
+    "pink",
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "teal",
+    "graphite",
+)

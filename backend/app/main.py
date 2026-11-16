@@ -158,6 +158,8 @@ async def create_briefing(
         lookback=body.lookback,
         finance_mode=body.finance_mode,
         watch_urls=body.watch_urls,
+        icon=body.icon,
+        color=body.color,
         next_run_at=next_run_after(body.delivery_time, body.timezone, now_utc()),
     )
     session.add(briefing)
@@ -180,7 +182,7 @@ async def update_briefing(
     if changes.get("delivery_time"):
         changes["delivery_time"] = changes["delivery_time"].replace(second=0, microsecond=0)
     for field, value in changes.items():
-        if value is not None or field == "region":
+        if value is not None or field in ("region", "icon", "color"):
             setattr(briefing, field, value)
     if not voice_supports(briefing.voice, briefing.language):
         raise HTTPException(

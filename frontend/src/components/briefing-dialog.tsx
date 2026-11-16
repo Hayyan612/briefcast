@@ -31,6 +31,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  SourceFields,
+  sourceDefaults,
+  type SourceSettings,
+} from "@/components/source-fields";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceFields } from "@/components/voice-fields";
@@ -39,6 +44,7 @@ import {
   useBrowserTimezone,
 } from "@/hooks/use-browser-timezone";
 import { api } from "@/lib/api";
+import { splitList } from "@/lib/sources";
 import type { Briefing, Voice } from "@/lib/types";
 
 const EXAMPLES = [
@@ -81,6 +87,7 @@ export function BriefingDialog({
   const [emailEnabled, setEmailEnabled] = useState(
     briefing?.email_enabled ?? true,
   );
+  const [sources, setSources] = useState<SourceSettings>(() => sourceDefaults(briefing));
 
   const timezones = useMemo(() => timezoneOptions(timezone), [timezone]);
 
@@ -95,6 +102,12 @@ export function BriefingDialog({
         voice,
         language,
         email_enabled: emailEnabled,
+        trusted_domains: splitList(sources.trusted),
+        blocked_domains: splitList(sources.blocked),
+        region: sources.region || null,
+        lookback: sources.lookback,
+        finance_mode: sources.finance,
+        watch_urls: splitList(sources.watch),
       });
       if (briefing) {
         await api(`/briefings/${briefing.id}`, { method: "PATCH", body });
@@ -118,7 +131,7 @@ export function BriefingDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger ? <DialogTrigger render={trigger} /> : null}
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-lg">
         <form onSubmit={save} className="grid gap-5">
           <DialogHeader>
             <DialogTitle className="font-heading text-xl">
@@ -188,6 +201,7 @@ export function BriefingDialog({
                 setVoice(next.voice);
               }}
             />
+            <SourceFields value={sources} onChange={setSources} />
             <Field orientation="horizontal">
               <FieldContent>
                 <FieldLabel htmlFor="email-enabled">

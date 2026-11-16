@@ -17,7 +17,7 @@ from app.audio import audio_response
 from app.auth import CurrentUser
 from app.config import get_settings
 from app.db import DbSession
-from app.models import Episode, EpisodeAudio, EpisodeStatus, User
+from app.models import Briefing, Episode, EpisodeAudio, EpisodeStatus, User
 
 router = APIRouter()
 
@@ -78,6 +78,7 @@ async def public_feed(token: str, session: DbSession) -> Response:
       <link>{base}/episodes/{ep.id}</link>
       <description><![CDATA[{notes}]]></description>
       <enclosure url="{base}{feed_path(token)}/{ep.id}.mp3" length="{size}" type="audio/mpeg"/>
+      <itunes:image href="{base}{feed_path(token)}/art/{ep.briefing_id}.png"/>
       <itunes:duration>{ep.duration_seconds or 0}</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
     </item>"""
@@ -92,6 +93,8 @@ async def public_feed(token: str, session: DbSession) -> Response:
     <language>en</language>
     <description>Your daily research briefings, made by Briefcast.</description>
     <itunes:author>Briefcast</itunes:author>
+    <itunes:image href="{base}{feed_path(token)}/art/cover.png"/>
+    <image><url>{base}{feed_path(token)}/art/cover.png</url><title>Briefcast · {who}</title><link>{base}/dashboard</link></image>
     <itunes:explicit>false</itunes:explicit>
     <itunes:block>yes</itunes:block>
 {chr(10).join(items)}
@@ -120,3 +123,20 @@ async def public_feed_audio(
     if audio is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Episode not found")
     return audio_response(audio.data, audio.mime_type, range_header)
+
+
+@router.get("/public/feed/{token}/briefings/{briefing_id}")
+async def public_briefing_cover(token: str, briefing_id: uuid.UUID, session: DbSession) -> dict:
+    """Cover details for artwork rendering; only for briefings owned by the feed's user."""
+    user = await _user_for_token(session, token)
+    briefing = await session.scalar(
+        select(Briefing).where(Briefing.id == briefing_id, Briefing.user_id == user.id)
+    )
+    if briefing is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+    return {
+        "topic": briefing.topic,
+        "icon": briefing.icon,
+        "color": briefing.color,
+        "language": briefing.language,
+    }

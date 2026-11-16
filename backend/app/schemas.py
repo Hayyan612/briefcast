@@ -5,10 +5,20 @@ from datetime import datetime, time
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.cover import COLORS, ICONS
 from app.models import EpisodeStatus, EpisodeTrigger
 from app.scheduling import validate_timezone
 from app.sources import LOOKBACKS, REGIONS, normalize_domains, normalize_url, normalize_watch_urls
 from app.voices import DEFAULT_LANGUAGE, DEFAULT_VOICE, LANGUAGES, VOICES, voice_supports
+
+
+def check_cover(field: str, v: str | None) -> str | None:
+    if v in (None, ""):
+        return None
+    allowed = ICONS if field == "icon" else COLORS
+    if v not in allowed:
+        raise ValueError(f"Unknown {field}")
+    return v
 
 
 def check_region(v: str | None) -> str | None:
@@ -57,7 +67,10 @@ class BriefingIn(BaseModel):
     lookback: str = "day"
     finance_mode: bool = False
     watch_urls: list[str] = Field(default_factory=list)
+    icon: str | None = None
+    color: str | None = None
 
+    _cover = field_validator("icon", "color")(lambda cls, v, info: check_cover(info.field_name, v))
     _domains = field_validator("trusted_domains", "blocked_domains")(
         lambda cls, v: normalize_domains(v)
     )
@@ -114,7 +127,10 @@ class BriefingPatch(BaseModel):
     lookback: str | None = None
     finance_mode: bool | None = None
     watch_urls: list[str] | None = None
+    icon: str | None = None
+    color: str | None = None
 
+    _cover = field_validator("icon", "color")(lambda cls, v, info: check_cover(info.field_name, v))
     _domains = field_validator("trusted_domains", "blocked_domains")(
         lambda cls, v: None if v is None else normalize_domains(v)
     )
@@ -159,6 +175,8 @@ class EpisodeSummary(BaseModel):
     completed_at: datetime | None
     duration_seconds: int | None
     error: str | None
+    icon: str | None = None
+    color: str | None = None
 
 
 class Source(BaseModel):
@@ -191,6 +209,8 @@ class BriefingOut(BaseModel):
     lookback: str
     finance_mode: bool
     watch_urls: list[str]
+    icon: str | None
+    color: str | None
     pending_links: int = 0
     is_active: bool
     next_run_at: datetime
