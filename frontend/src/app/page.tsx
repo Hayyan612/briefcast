@@ -141,12 +141,28 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <main className="flex flex-1 flex-col gap-28 pb-24 md:gap-40">
         <div className="grid gap-12 md:gap-16">
           <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 pt-14 md:px-8 md:pt-20">
-            <span
-              className="rise w-fit rounded-full bg-mac-fill-tertiary px-3 py-1 text-mac-callout font-medium text-mac-label-secondary"
+            <a
+              href="https://gnani.ai"
+              target="_blank"
+              rel="noreferrer"
+              className="rise flex w-fit items-center gap-2 rounded-full bg-mac-fill-tertiary py-1 pr-3.5 pl-3 text-mac-callout font-medium text-mac-label-secondary transition-colors hover:bg-mac-fill-secondary"
               style={{ "--i": 0 } as React.CSSProperties}
             >
-              Gnani.ai voices in 11 languages
-            </span>
+              Powered by
+              {/* Gnani.ai's own logo (from gnani.ai), inverted to white in dark mode. */}
+              <Image
+                src="/brand/gnani.svg"
+                alt="Gnani.ai"
+                width={105}
+                height={45}
+                unoptimized
+                className="-my-1 h-7 w-auto dark:invert"
+              />
+              <span aria-hidden className="text-mac-label-tertiary">
+                ·
+              </span>
+              Voices in 11 languages
+            </a>
             <TwoTone
               as="h1"
               lead="Wake up to your own news podcast."
@@ -363,12 +379,21 @@ export default function Home({ searchParams }: PageProps<"/">) {
           <span>Built by Hayyan Hajwani in Mumbai.</span>
           <span className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span>
-              Voices by{" "}
               <a
                 href="https://gnani.ai"
-                className="text-mac-label hover:underline"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 hover:text-mac-label"
               >
-                Gnani.ai
+                Powered by
+                <Image
+                  src="/brand/gnani.svg"
+                  alt="Gnani.ai"
+                  width={105}
+                  height={45}
+                  unoptimized
+                  className="h-5 w-auto dark:invert"
+                />
               </a>
             </span>
             <span>
