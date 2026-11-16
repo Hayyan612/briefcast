@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notify";
 
 import {
   ArrowLeftIcon,

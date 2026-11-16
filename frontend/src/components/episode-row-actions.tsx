@@ -7,7 +7,7 @@ import {
   ExternalLinkIcon,
   RotateCcwIcon,
 } from "@/components/icons";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notify";
 
 import { Button } from "@/components/ui/button";
 import {

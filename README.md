@@ -117,12 +117,15 @@ Google OAuth redirect URI: `<APP_URL>/api/auth/callback/google`.
 
 ## Frontend
 
-Next.js 16 (App Router, Cache Components) with **shadcn/ui on Base UI**, Quicksand, a light
-violet theme checked against WCAG AA (text ≥ 4.5:1, form borders ≥ 3:1), and Motion for
-transitions (all of them respect `prefers-reduced-motion`).
+Next.js 16 (App Router, Cache Components) with **shadcn/ui on Base UI**, styled with the
+[CupertinoUI](https://www.cupertino-ui.com/) macOS 27 theme (free, MIT): the signed-in app is a
+macOS window with a source-list sidebar, toolbar search, SF Pro, system colors and icon tiles.
+Two macOS tokens are nudged so text meets WCAG AA (accent `#0071e3`, secondary labels 60%);
+every visible label measures ≥ 4.5:1. Motion handles transitions, and all of them respect
+`prefers-reduced-motion`.
 
-- **App shell:** shadcn `Sidebar` with your briefings, search (`⌘K`), and a persistent
-  bottom player (one `<audio>` element in a React context, so playback continues across
+- **App shell:** a CupertinoUI `Window` holding the briefings sidebar, toolbar search (`⌘K`),
+  and a player docked to the window's bottom edge (one `<audio>` element in a React context, so playback continues across
   pages; ±15 s, speed, volume, seek, Space to play or pause).
 - **Onboarding:** four short steps (welcome, topic, schedule and voice, review) that create
   the first briefing and immediately generate its first episode.
@@ -133,5 +136,6 @@ transitions (all of them respect `prefers-reduced-motion`).
 
 ## Credits
 
+- macOS components and theme: [CupertinoUI](https://www.cupertino-ui.com/) (MIT).
 - Layout inspired by [Free Podcast Player Web Design](https://www.figma.com/community/file/1247099379637461701/free-podcast-player-web-design) by wellrafi (CC BY 4.0).
 - Icons: Solar by 480 Design (CC BY 4.0), via [`@solar-icons/react`](https://www.npmjs.com/package/@solar-icons/react) (MIT).

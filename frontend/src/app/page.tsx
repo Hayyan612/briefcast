@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import Link from "next/link";
+
+import { LinkButton } from "@/components/link-button";
 import {
   AudioLinesIcon,
   ClockIcon,
@@ -11,7 +12,7 @@ import {
 import { auth, signIn } from "@/auth";
 import { Brand } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -69,15 +70,9 @@ async function SignInCta({
       : "/dashboard";
   if (session?.user) {
     return (
-      <Link
-        href={next}
-        className={buttonVariants({
-          size: "lg",
-          className: "h-11 w-fit px-5 text-base",
-        })}
-      >
+      <LinkButton href={next} size="lg" className="h-11 w-fit px-5 text-base">
         Open your briefings
-      </Link>
+      </LinkButton>
     );
   }
   async function signInWithGoogle() {
@@ -140,16 +135,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
         </Card>
       </div>
       <footer className="text-sm text-muted-foreground">
-        <Link
-          href="/privacy"
-          className={buttonVariants({
-            variant: "link",
-            size: "sm",
-            className: "px-0",
-          })}
-        >
+        <LinkButton href="/privacy" variant="link" size="sm" className="px-0">
           Privacy policy
-        </Link>
+        </LinkButton>
       </footer>
     </main>
   );

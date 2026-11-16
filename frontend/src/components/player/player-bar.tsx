@@ -53,14 +53,14 @@ function PlayerBarInner() {
 
   return (
     <motion.div
-      initial={{ y: "110%" }}
-      animate={{ y: 0 }}
-      exit={{ y: "110%" }}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
       role="region"
       aria-label="Audio player"
-      className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/75 shadow-[0_-8px_30px_-12px_oklch(0.5_0.2_292/25%)] backdrop-blur-xl"
+      className="overflow-hidden border-t bg-mac-window/95 backdrop-blur"
     >
-      <div className="mx-auto grid h-20 max-w-screen-2xl grid-cols-[1fr_auto] items-center gap-4 px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="mx-auto grid h-[72px] max-w-screen-2xl grid-cols-[1fr_auto] items-center gap-4 px-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)]">
         <Link
           href={`/episodes/${p.track.id}`}
           className="flex min-w-0 items-center gap-3"
@@ -183,10 +183,4 @@ function PlayerBarInner() {
       </div>
     </motion.div>
   );
-}
-
-/** Reserves space at the bottom of the page so content never hides under the bar. */
-export function PlayerSpacer() {
-  const p = usePlayer();
-  return p.track ? <div className="h-24 shrink-0" aria-hidden /> : null;
 }

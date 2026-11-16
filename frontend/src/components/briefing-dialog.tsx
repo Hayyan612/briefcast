@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type ReactElement } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { notify as toast } from "@/lib/notify";
 
 import { Button } from "@/components/ui/button";
 import {

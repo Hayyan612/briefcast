@@ -1,28 +1,40 @@
 "use client";
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
-import { cn } from "cn";
 
+import { cn } from "@/lib/utils";
+
+// A macOS 27 switch: a capsule track with a pill-shaped knob. Sizes follow
+// the macOS control sizes; System Settings uses `mini` in its grouped forms.
+//   mini 36x16 (knob 21x13) · sm 44x20 (26x16) · default 54x24 (32x20) · lg 64x28 (38x24)
 function Switch({
   className,
   size = "default",
   ...props
 }: SwitchPrimitive.Root.Props & {
-  size?: "sm" | "default";
+  size?: "mini" | "sm" | "default" | "lg";
 }) {
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
       data-size={size}
       className={cn(
-        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent transition-all outline-none group-has-[:focus-visible]/field-label:border-transparent group-has-[:focus-visible]/field-label:ring-0 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-[size=default]:h-[18.4px] data-[size=default]:w-[32px] data-[size=sm]:h-[14px] data-[size=sm]:w-[24px] dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:bg-primary data-unchecked:bg-input dark:data-unchecked:bg-input/80 data-disabled:cursor-not-allowed data-disabled:opacity-50",
+        "peer group/switch inline-flex shrink-0 items-center rounded-full transition-colors outline-none focus-visible:mac-focus-ring data-disabled:cursor-not-allowed data-disabled:opacity-40",
+        "data-[size=mini]:h-4 data-[size=mini]:w-9 data-[size=mini]:px-[1.5px] data-[size=sm]:h-5 data-[size=sm]:w-11 data-[size=sm]:px-0.5 data-[size=default]:h-6 data-[size=default]:w-[54px] data-[size=default]:px-0.5 data-[size=lg]:h-7 data-[size=lg]:w-16 data-[size=lg]:px-0.5",
+        "data-checked:bg-mac-accent data-unchecked:bg-black/[0.085] dark:data-unchecked:bg-white/[0.085] group-data-[inactive]/window:data-checked:bg-black/14 dark:group-data-[inactive]/window:data-checked:bg-white/13",
         className,
       )}
       {...props}
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
-        className="pointer-events-none block rounded-full bg-background ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] dark:data-checked:bg-primary-foreground group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0 dark:data-unchecked:bg-foreground"
+        className={cn(
+          "pointer-events-none block rounded-full bg-white shadow-[0_3px_36px_rgb(0_0_0/0.05),0_0_0_0.5px_rgb(0_0_0/0.04),0_1px_2px_rgb(0_0_0/0.12)] transition-transform duration-200 dark:shadow-none dark:group-data-[inactive]/window:bg-[#e2e2e2]",
+          "group-data-[size=mini]/switch:h-[13px] group-data-[size=mini]/switch:w-[21px] group-data-[size=sm]/switch:h-4 group-data-[size=sm]/switch:w-[26px] group-data-[size=default]/switch:h-5 group-data-[size=default]/switch:w-8 group-data-[size=lg]/switch:h-6 group-data-[size=lg]/switch:w-[38px]",
+          "data-unchecked:translate-x-0 group-data-[size=mini]/switch:data-checked:translate-x-3 group-data-[size=sm]/switch:data-checked:translate-x-3.5 group-data-[size=default]/switch:data-checked:translate-x-[18px] group-data-[size=lg]/switch:data-checked:translate-x-[22px]",
+          // Right to left, the knob moves the other way.
+          "rtl:group-data-[size=mini]/switch:data-checked:-translate-x-3 rtl:group-data-[size=sm]/switch:data-checked:-translate-x-3.5 rtl:group-data-[size=default]/switch:data-checked:-translate-x-[18px] rtl:group-data-[size=lg]/switch:data-checked:-translate-x-[22px]",
+        )}
       />
     </SwitchPrimitive.Root>
   );

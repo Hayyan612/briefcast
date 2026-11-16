@@ -1,11 +1,11 @@
-import Link from "next/link";
+
+import { LinkButton } from "@/components/link-button";
 import { BookOpenIcon, ClockIcon, FileTextIcon } from "@/components/icons";
 
 import { CoverArt } from "@/components/cover-art";
 import { PlayButton } from "@/components/player/play-button";
 import { LocalTime } from "@/components/local-time";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDuration } from "@/lib/format";
 import type { EpisodeSummary } from "@/lib/types";
@@ -25,19 +25,19 @@ export function EpisodeHero({
   const title = episode.title ?? episode.topic;
   return (
     <Card className="rise py-0">
-      <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center md:p-8">
+      <CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center">
         <CoverArt
           topic={episode.topic}
-          className="size-20 shrink-0 text-2xl sm:size-28 sm:text-3xl md:size-32 md:text-4xl"
+          className="size-20 rounded-[18px] md:size-24 md:rounded-[22px]"
         />
         <div className="grid min-w-0 gap-3">
-          <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase">
+          <span className="text-mac-subheadline font-semibold text-mac-label-secondary">
             {eyebrow}
           </span>
-          <h1 className="font-heading text-2xl leading-tight font-bold tracking-tight text-balance md:text-4xl">
+          <h1 className="text-mac-title-1 font-bold text-balance">
             {title}
           </h1>
-          <p className="line-clamp-2 text-foreground/70">{episode.topic}</p>
+          <p className="line-clamp-2 text-mac-body text-mac-label-secondary">{episode.topic}</p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline">
               <ClockIcon data-icon="inline-start" />
@@ -57,21 +57,17 @@ export function EpisodeHero({
             <PlayButton
               size="lg"
               label="Play episode"
-              className="h-11 rounded-full px-6"
               track={{ id: episode.id, title, topic: episode.topic }}
             />
             {showOpen ? (
-              <Link
+              <LinkButton
                 href={`/episodes/${episode.id}`}
-                className={buttonVariants({
-                  variant: "outline",
-                  size: "lg",
-                  className: "h-11 rounded-full px-5",
-                })}
+                variant="outline"
+                size="lg"
               >
                 <FileTextIcon data-icon="inline-start" />
                 Script and sources
-              </Link>
+              </LinkButton>
             ) : null}
           </div>
         </div>

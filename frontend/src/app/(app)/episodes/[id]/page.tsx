@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import Link from "next/link";
+
+import { LinkButton } from "@/components/link-button";
 import { notFound, redirect } from "next/navigation";
 import {
   ArrowLeftIcon,
@@ -26,7 +27,6 @@ import {
 } from "@/components/ui/alert";
 import { LocalTime } from "@/components/local-time";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -251,17 +251,15 @@ export default function EpisodePage({ params }: PageProps<"/episodes/[id]">) {
   return (
     <>
       <div className="mx-auto grid w-full max-w-4xl gap-6">
-        <Link
+        <LinkButton
           href="/dashboard"
-          className={buttonVariants({
-            variant: "ghost",
-            size: "sm",
-            className: "w-fit",
-          })}
+          variant="ghost"
+          size="sm"
+          className="w-fit"
         >
           <ArrowLeftIcon data-icon="inline-start" />
           All briefings
-        </Link>
+        </LinkButton>
         <Suspense
           fallback={
             <div className="grid gap-4">

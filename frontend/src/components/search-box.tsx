@@ -4,11 +4,9 @@ import { useEffect, useRef } from "react";
 import Form from "next/form";
 import { useSearchParams } from "next/navigation";
 
-import { SearchIcon } from "@/components/icons";
-import { Input } from "@/components/ui/input";
-import { Kbd } from "@/components/ui/kbd";
+import { SearchField } from "@/components/ui/search-field";
 
-/** Submits to /dashboard?q=… (shareable, server-rendered). ⌘K / Ctrl+K focuses it. */
+/** Toolbar search. Submits to /dashboard?q=… ; ⌘K / Ctrl+K focuses it. */
 export function SearchBox() {
   const ref = useRef<HTMLInputElement>(null);
   const q = useSearchParams().get("q") ?? "";
@@ -26,25 +24,17 @@ export function SearchBox() {
   }, []);
 
   return (
-    <Form
-      action="/dashboard"
-      role="search"
-      className="relative w-full max-w-xl"
-    >
-      <SearchIcon className="pointer-events-none absolute top-1/2 left-3.5 size-[18px] -translate-y-1/2 text-foreground/70" />
-      <Input
+    <Form action="/dashboard" role="search" className="w-full max-w-xs">
+      <SearchField
         ref={ref}
         key={q}
         name="q"
-        type="search"
+        size="lg"
         defaultValue={q}
-        placeholder="Search episodes and topics"
+        placeholder="Search episodes  ⌘K"
         aria-label="Search episodes and topics"
-        className="h-11 rounded-full border-input bg-card pr-14 pl-10 text-[15px] shadow-xs placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/25"
+        className="w-full"
       />
-      <Kbd className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 sm:inline-flex">
-        ⌘K
-      </Kbd>
     </Form>
   );
 }

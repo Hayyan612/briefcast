@@ -1,6 +1,7 @@
 import type React from "react";
 import { Suspense } from "react";
-import Link from "next/link";
+
+import { LinkButton } from "@/components/link-button";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { HeadphonesIcon, PlusIcon, XIcon } from "@/components/icons";
@@ -13,7 +14,7 @@ import { EpisodeHero } from "@/components/episode-hero";
 import { EpisodesTable } from "@/components/episodes-table";
 import { Onboarding } from "@/components/onboarding";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Empty,
@@ -74,13 +75,10 @@ async function DashboardContent({ searchParams }: { searchParams: Search }) {
           {q ? (
             <Badge variant="secondary">Search: “{one(params.q)}”</Badge>
           ) : null}
-          <Link
-            href="/dashboard"
-            className={buttonVariants({ variant: "ghost", size: "sm" })}
-          >
+          <LinkButton href="/dashboard" variant="ghost" size="sm">
             <XIcon data-icon="inline-start" />
             Clear
-          </Link>
+          </LinkButton>
         </div>
       ) : null}
 
