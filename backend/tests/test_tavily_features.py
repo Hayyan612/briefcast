@@ -154,30 +154,54 @@ async def test_followed_site_baseline_then_only_new_pages():
         await s.commit()
         bid = b.id
 
-    site_pages = ["https://lab.example.org/news/a", "https://lab.example.org/news/b"]
+    site_pages = [
+        "https://lab.example.org/news/model-a-launch-notes",
+        "https://lab.example.org/news/safety-b-update-report",
+    ]
     tav = FakeTavily(
         mapped=site_pages,
-        search_results={"trusted": [r("https://lab.example.org/news/b")]},
+        search_results={"trusted": [r("https://lab.example.org/news/safety-b-update-report")]},
         extracted={
-            u: f"Article {u[-1]} body text" for u in site_pages + ["https://lab.example.org/news/c"]
+            u: f"Article {u} " + "body text " * 200
+            for u in site_pages + ["https://lab.example.org/news/c-new-feature-post"]
         },
     )
     async with SessionLocal() as s:
         ctx = await gather_context(s, tav, await s.get(Briefing, bid), uuid.uuid4())
     # Baseline: all mapped pages recorded as seen; content comes from a site-restricted search.
     assert {p.url for p in ctx.new_pages} == set(site_pages)
-    assert [p["url"] for p in ctx.prefs.watched] == ["https://lab.example.org/news/b"]
+    assert [p["url"] for p in ctx.prefs.watched] == [
+        "https://lab.example.org/news/safety-b-update-report"
+    ]
 
     async with SessionLocal() as s:
         for p in ctx.new_pages:
             s.add(WatchedPage(briefing_id=bid, site=p.site, url=p.url))
         await s.commit()
 
-    tav.mapped = site_pages + ["https://lab.example.org/news/c"]
+    tav.mapped = site_pages + [
+        "https://lab.example.org/news/c-new-feature-post",
+        "https://lab.example.org/news/page/2",
+    ]
     async with SessionLocal() as s:
         ctx2 = await gather_context(s, tav, await s.get(Briefing, bid), uuid.uuid4())
         seen = (
             await s.scalars(select(WatchedPage.url).where(WatchedPage.briefing_id == bid))
         ).all()
-    assert [p["url"] for p in ctx2.prefs.watched] == ["https://lab.example.org/news/c"]
+    assert [p["url"] for p in ctx2.prefs.watched] == [
+        "https://lab.example.org/news/c-new-feature-post"
+    ]
     assert len(seen) == 2
+
+
+def test_article_filter():
+    from app.agent.context import keep_real_articles, looks_like_article
+
+    site = "https://inc42.com/buzz"
+    assert looks_like_article("https://inc42.com/buzz/zepto-raises-funding-round-led-by-x/", site)
+    assert not looks_like_article("https://inc42.com/buzz/", site)
+    assert not looks_like_article("https://inc42.com/tag/funding-news-india/", site)
+    assert not looks_like_article("https://inc42.com/buzz/page/2", site)
+    nav = "Menu Home News Buzz " * 120
+    pages = [{"content": nav}, {"content": nav}, {"content": "short"}, {"content": "real " * 400}]
+    assert len(keep_real_articles(pages)) == 2

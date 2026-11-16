@@ -48,6 +48,34 @@ async def _extract(tavily: AsyncTavilyClient, urls: list[str]) -> dict[str, str]
     return {r["url"]: (r.get("raw_content") or "")[:PAGE_CHARS] for r in resp.get("results", [])}
 
 
+MIN_ARTICLE_CHARS = 1200
+
+
+def looks_like_article(url: str, site: str) -> bool:
+    """Skip listing, tag and pagination pages: articles have a slug with words in it."""
+    path = urlparse(url).path.rstrip("/")
+    last = path.rsplit("/", 1)[-1]
+    if path == urlparse(site).path.rstrip("/") or not last:
+        return False
+    if any(seg in path for seg in ("/tag/", "/tags/", "/category/", "/author/", "/page/")):
+        return False
+    return last.count("-") >= 2
+
+
+def keep_real_articles(pages: list[dict]) -> list[dict]:
+    """Drop pages whose text is too short or is the same boilerplate as another page."""
+    seen: set[str] = set()
+    out = []
+    for page in pages:
+        text = page.get("content", "")
+        fingerprint = text[:400]
+        if len(text) < MIN_ARTICLE_CHARS or fingerprint in seen:
+            continue
+        seen.add(fingerprint)
+        out.append(page)
+    return out
+
+
 def _title_from(content: str, url: str) -> str:
     for line in content.splitlines():
         line = line.strip("# ").strip()
@@ -142,19 +170,25 @@ async def _watched(
                     time_range=lookback,
                     max_results=MAX_NEW_PER_SITE,
                 )
-                candidates = [r["url"] for r in found.get("results", []) if r.get("url")]
+                candidates = [
+                    r["url"]
+                    for r in found.get("results", [])
+                    if r.get("url") and looks_like_article(r["url"], site)
+                ]
             except Exception as exc:  # noqa: BLE001
                 log.warning("site search failed for %s: %s", site, exc)
                 candidates = []
         else:
-            candidates = fresh[:MAX_NEW_PER_SITE]
+            candidates = [u for u in fresh if looks_like_article(u, site)][:MAX_NEW_PER_SITE]
 
         texts = await _extract(tavily, candidates)
-        pages += [
-            {"url": u, "title": _title_from(texts[u], u), "content": texts[u], "site": site}
-            for u in candidates
-            if texts.get(u)
-        ]
+        pages += keep_real_articles(
+            [
+                {"url": u, "title": _title_from(texts[u], u), "content": texts[u], "site": site}
+                for u in candidates
+                if texts.get(u)
+            ]
+        )
     return pages, new_rows
 
 
