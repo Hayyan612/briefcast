@@ -77,3 +77,27 @@
     animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
+
+/*
+ * Overlays (dialogs, alerts, sheets, menus, selects, tooltips) animate with tw-animate,
+ * whose exit animations default to fill-mode "none": the last frame snaps back to fully
+ * visible before Base UI unmounts the element, which shows up as a flash. Hold the final
+ * frame, and keep backdrop and popup on one timing so they leave together.
+ */
+[data-closed] {
+  animation-fill-mode: forwards !important;
+}
+:is([data-slot$="-overlay"], [data-slot$="-content"], [data-slot$="-popup"])[data-open] {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is([data-slot$="-overlay"], [data-slot$="-content"], [data-slot$="-popup"])[data-closed] {
+  animation-duration: 160ms !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-open],
+  [data-closed] {
+    animation-duration: 1ms !important;
+  }
+}

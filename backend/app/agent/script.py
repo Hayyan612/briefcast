@@ -54,7 +54,8 @@ def language_rules(language: str) -> str:
     return (
         f"\nLanguage: write the entire script in {lang['label']} ({lang['native']}), in "
         f"{lang['script']} script, as a native {lang['label']} news host would speak. "
-        "Keep company names, brands and people's names in their usual form. Write numbers, "
+        "Write company, publication and brand names entirely in Latin script, never half "
+        "transliterated (for example 'Entrackr', not a mix of scripts). Write numbers, "
         f"money and dates as spoken {lang['label']} words. The title must be in {lang['label']} too."
     )
 

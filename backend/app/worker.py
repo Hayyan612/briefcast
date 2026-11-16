@@ -159,8 +159,12 @@ async def generate_episode(ctx: dict, episode_id_str: str) -> str:
                 sources=[s.public() for s in research.sources],
                 research_log=research.log,
             )
+            # Indic speech runs slower per word than English, so aim for fewer words.
+            target = settings.target_words
+            if briefing.language != "en-IN":
+                target = int(target * 0.8)
             title, script = await write_script(
-                ctx["llm"], ep.topic, local_date, research, settings.target_words, briefing.language
+                ctx["llm"], ep.topic, local_date, research, target, briefing.language
             )
             await set_status(episode_id, EpisodeStatus.writing, title=title, script=script)
 
