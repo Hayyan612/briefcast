@@ -134,6 +134,18 @@ export default function Home({ searchParams }: PageProps<"/">) {
           </CardContent>
         </Card>
       </div>
+      <footer className="text-sm text-muted-foreground">
+        <Link
+          href="/privacy"
+          className={buttonVariants({
+            variant: "link",
+            size: "sm",
+            className: "px-0",
+          })}
+        >
+          Privacy policy
+        </Link>
+      </footer>
     </main>
   );
 }
