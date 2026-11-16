@@ -7,7 +7,8 @@ FROM node:24-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
+ARG APP_URL=http://localhost:3000
+ENV NEXT_TELEMETRY_DISABLED=1 AUTH_URL=$APP_URL
 RUN npm run build
 
 FROM node:24-alpine AS run

@@ -3,7 +3,11 @@
 # through Next.js. Secrets come from .env next to this file (see .env.example).
 services:
   web:
-    build: ./frontend
+    build:
+      context: ./frontend
+      # Baked into page metadata at build time (absolute link-preview image URLs).
+      args:
+        APP_URL: ${APP_URL}
     restart: unless-stopped
     environment:
       AUTH_SECRET: ${AUTH_SECRET}

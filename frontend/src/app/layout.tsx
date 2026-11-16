@@ -25,9 +25,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  // Absolute URLs for the link-preview image (set from APP_URL in docker-compose).
+  metadataBase: new URL(process.env.AUTH_URL ?? "http://localhost:3000"),
   title: "Briefcast · Your daily research podcast",
-  description:
-    "Pick a topic and a time. Get a five-minute podcast on it, every day.",
+  applicationName: "Briefcast",
+  description: "A five-minute research podcast on what you follow, every day.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

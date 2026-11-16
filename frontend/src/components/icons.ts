@@ -41,7 +41,6 @@ export {
   MinimalisticMagnifierIcon as SearchIcon,
   PenIcon as PencilIcon,
   PlaybackSpeedIcon as GaugeIcon,
-  PodcastIcon as RadioIcon,
   RefreshIcon as Loader2Icon,
   RestartIcon as RotateCcwIcon,
   RssIcon,

@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
 import { ImageResponse } from "next/og";
 
 import { publicBackendFetch } from "@/lib/backend";
@@ -9,7 +12,7 @@ type Cover = { topic: string; icon: string | null; color: string | null };
 
 /**
  * Podcast artwork, drawn on demand from the briefing's cover choice:
- *   /feed/{token}/art/cover.png        channel artwork (the whole feed)
+ *   /feed/{token}/art/cover.png        channel artwork: the designed Briefcast cover
  *   /feed/{token}/art/{briefingId}.png episode artwork for one briefing
  * The token must own the briefing, so artwork never reveals another user's topics.
  */
@@ -20,18 +23,24 @@ export async function GET(
   const { token, file } = await ctx.params;
   const id = file.replace(/\.png$/, "");
 
-  let cover: Cover = {
-    topic: "Your daily briefings",
-    icon: "podcast",
-    color: "blue",
-  };
-  if (id !== "cover") {
-    const res = await publicBackendFetch(
-      `/public/feed/${encodeURIComponent(token)}/briefings/${encodeURIComponent(id)}`,
+  // The whole feed uses the designed Briefcast cover; each briefing gets its own tile.
+  if (id === "cover") {
+    const png = await readFile(
+      path.join(process.cwd(), "public/brand/podcast-cover.png"),
     );
-    if (!res.ok) return new Response("Not found", { status: 404 });
-    cover = (await res.json()) as Cover;
+    return new Response(new Uint8Array(png), {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=86400",
+      },
+    });
   }
+
+  const res = await publicBackendFetch(
+    `/public/feed/${encodeURIComponent(token)}/briefings/${encodeURIComponent(id)}`,
+  );
+  if (!res.ok) return new Response("Not found", { status: 404 });
+  const cover = (await res.json()) as Cover;
 
   const chosen = resolveCover(cover.topic, cover.icon, cover.color);
   const { Icon } = COVER_ICONS[chosen.icon];

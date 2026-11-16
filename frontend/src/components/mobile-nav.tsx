@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { BrandMark } from "@/components/brand";
 import { SidebarIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,7 +39,8 @@ export function MobileNav({ children }: { children: ReactNode }) {
       </SheetTrigger>
       <SheetContent side="left" className="flex w-72 flex-col gap-2 p-0">
         <div className="flex h-14 shrink-0 items-center border-b px-5 pr-14">
-          <SheetTitle className="text-mac-headline font-semibold">
+          <SheetTitle className="flex items-center gap-2 text-mac-headline font-semibold">
+            <BrandMark className="size-6" />
             Briefcast
           </SheetTitle>
         </div>
