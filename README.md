@@ -141,6 +141,98 @@ stateDiagram-v2
     failed --> queued: Retry (skips stages already saved)
 ```
 
+### Database schema
+
+```mermaid
+erDiagram
+    users ||--o{ briefings : owns
+    users ||--o{ episodes : "owns (copied for one-filter checks)"
+    briefings ||--o{ episodes : produces
+    episodes ||--o| episode_audio : "MP3 kept apart"
+    briefings ||--o{ briefing_links : "links to include"
+    episodes |o--o{ briefing_links : "used in"
+    briefings ||--o{ watched_pages : "pages already seen"
+
+    users {
+        uuid id PK
+        string email UK
+        string name
+        text image
+        string feed_token UK "private podcast feed, rotatable"
+        timestamptz created_at
+    }
+    briefings {
+        uuid id PK
+        uuid user_id FK
+        text topic
+        jsonb interests
+        time delivery_time "wall clock, e.g. 08:00"
+        string timezone "IANA, survives DST"
+        timestamptz next_run_at "UTC, indexed; scheduler compares to now()"
+        string voice "model:voice"
+        string language
+        bool is_active
+        bool email_enabled
+        jsonb trusted_domains
+        jsonb blocked_domains
+        string region
+        string lookback
+        bool finance_mode
+        jsonb watch_urls
+        string icon
+        string color
+    }
+    episodes {
+        uuid id PK
+        uuid briefing_id FK "unique with scheduled_for"
+        uuid user_id FK
+        timestamptz scheduled_for "unique with briefing_id"
+        text topic "snapshot at creation"
+        enum trigger "scheduled | manual"
+        enum status "queued .. ready | failed"
+        text title
+        text script
+        jsonb sources
+        jsonb findings
+        jsonb research_log
+        jsonb transcript "[start, end, text, p]"
+        int duration_seconds
+        int attempts
+        text error
+        timestamptz started_at
+        timestamptz completed_at
+        timestamptz emailed_at
+    }
+    episode_audio {
+        uuid episode_id PK, FK
+        string mime_type
+        bytea data
+    }
+    briefing_links {
+        uuid id PK
+        uuid briefing_id FK
+        uuid used_episode_id FK "set null on delete"
+        text url
+        text title
+        timestamptz used_at
+    }
+    watched_pages {
+        uuid id PK
+        uuid briefing_id FK "unique with url"
+        text site
+        text url "unique with briefing_id"
+        timestamptz first_seen_at
+    }
+    voice_previews {
+        string key PK "voice + language"
+        bytea data
+        timestamptz created_at
+    }
+```
+
+Deleting a user cascades to everything they own. The unique pair `(briefing_id, scheduled_for)`
+is what makes the scheduler safe to run twice: a second insert for the same slot does nothing.
+
 ### Where each part lives
 
 | Part | What it does | Code |
